@@ -1,0 +1,10 @@
+.env
+.DS_Store
+.env.admin
+.venv/
+__pycache__/
+*.pyc
+data/*.db
+!data/seed.db
+data/*.db-*
+chatbot.db

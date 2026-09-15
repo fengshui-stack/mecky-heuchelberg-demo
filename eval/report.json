@@ -1,0 +1,12 @@
+{
+  "questions": 130,
+  "known": 66,
+  "partial": 50,
+  "unknown": 14,
+  "link_correctness": 1.0,
+  "prohibited_claim_rate": 0.0,
+  "median_latency_ms": 2,
+  "p95_latency_ms": 3,
+  "limitations": "Automated checks cover links and prohibited phrases; human review is needed for factual correctness and naturalness.",
+  "failures": []
+}
