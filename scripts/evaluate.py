@@ -1,14 +1,16 @@
 import json
 import statistics
 import time
+import uuid
 from pathlib import Path
 from mecky.engine import chat
 
 cases=[json.loads(x) for x in Path("eval/questions.jsonl").read_text(encoding="utf-8").splitlines()]
 results=[]
+run_id=uuid.uuid4().hex[:10]
 for i,case in enumerate(cases):
     start=time.monotonic()
-    answer=chat(f"eval-{i}",case["question"])
+    answer=chat(f"eval-{run_id}-{i}",case["question"])
     latency=(time.monotonic()-start)*1000
     expected=case["expected_relevant_url"]
     url_ok=not expected or any(expected in x["url"] for x in answer["links"])

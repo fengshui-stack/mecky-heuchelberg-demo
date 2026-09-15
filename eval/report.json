@@ -1,8 +1,8 @@
 {
   "questions": 130,
-  "known": 72,
-  "partial": 50,
-  "unknown": 8,
+  "known": 88,
+  "partial": 41,
+  "unknown": 1,
   "link_correctness": 1.0,
   "prohibited_claim_rate": 0.0,
   "median_latency_ms": 3,

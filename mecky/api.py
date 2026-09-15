@@ -1,4 +1,5 @@
 import hmac
+import json
 import os
 import secrets
 from pathlib import Path
@@ -14,7 +15,7 @@ load_dotenv()
 from .engine import chat
 from .store import connect, now, stable_id
 
-app=FastAPI(title="Mecky Demo",version="0.1.0")
+app=FastAPI(title="Mecky Demo",version="0.2.0")
 origins=[x.strip() for x in os.getenv("MECKY_ALLOWED_ORIGINS","https://mecky-kundentest.ben-fenger.chatgpt.site").split(",") if x.strip()]
 if origins:
     app.add_middleware(CORSMiddleware,allow_origins=origins,allow_methods=["GET","POST","PATCH","DELETE"],allow_headers=["content-type","x-admin-secret"])
@@ -136,9 +137,22 @@ def analytics(x_admin_secret:str|None=Header(default=None)):
     intents=[dict(x) for x in db.execute("SELECT intent,count(*) count,avg(confidence) confidence FROM interactions GROUP BY intent ORDER BY count DESC LIMIT 20")]
     negative=[dict(x) for x in db.execute("SELECT f.rating,f.comment,i.intent,i.answer FROM feedback f JOIN interactions i ON i.id=f.interaction_id WHERE f.rating<0 ORDER BY f.id DESC LIMIT 20")]
     model_usage=[dict(x) for x in db.execute("SELECT provider,model,count(*) requests,sum(tokens_input) tokens_input,sum(tokens_output) tokens_output,sum(estimated_cost) estimated_cost FROM llm_usage GROUP BY provider,model")]
+    response_types=[dict(x) for x in db.execute("SELECT json_extract(detail,'$.type') response_type,count(*) count FROM decision_events WHERE stage='response' GROUP BY response_type ORDER BY count DESC")]
+    retrieval=db.execute("SELECT count(*) requests,sum(CASE WHEN json_extract(detail,'$.gate')=1 THEN 1 ELSE 0 END) indexed_searches,sum(coalesce(json_extract(detail,'$.indexed_hits'),0)) indexed_hits FROM decision_events WHERE stage='retrieval'").fetchone()
     total=db.execute("SELECT count(*) FROM interactions").fetchone()[0]
     db.close()
-    return {"total":total,"intents":intents,"negative_feedback":negative,"model_usage":model_usage}
+    return {"total":total,"intents":intents,"negative_feedback":negative,"model_usage":model_usage,
+            "response_types":response_types,"retrieval":{"requests":retrieval[0],"indexed_searches":retrieval[1],"indexed_hits":retrieval[2]}}
+
+@app.get("/admin/traces")
+def traces(limit:int=20,x_admin_secret:str|None=Header(default=None)):
+    require_admin(x_admin_secret)
+    if not 1<=limit<=100: raise HTTPException(422,"limit must be 1 to 100")
+    db=connect()
+    rows=[{"interaction_id":x["interaction_id"],"stage":x["stage"],"detail":json.loads(x["detail"]),"created_at":x["created_at"]}
+          for x in db.execute("SELECT interaction_id,stage,detail,created_at FROM decision_events ORDER BY id DESC LIMIT ?",(limit,))]
+    db.close()
+    return {"items":rows}
 
 @app.get("/")
 def index(): return FileResponse(Path("frontend/index.html"))

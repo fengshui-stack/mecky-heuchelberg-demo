@@ -27,6 +27,10 @@ CREATE TABLE IF NOT EXISTS crawl_runs(id INTEGER PRIMARY KEY,started_at TEXT,fin
 CREATE TABLE IF NOT EXISTS llm_usage(id INTEGER PRIMARY KEY,provider TEXT,model TEXT,tokens_input INTEGER,tokens_output INTEGER,estimated_cost REAL,created_at TEXT);
 CREATE TABLE IF NOT EXISTS interaction_usage(interaction_id INTEGER PRIMARY KEY,session_id TEXT NOT NULL,usage TEXT NOT NULL,created_at TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS interaction_usage_session ON interaction_usage(session_id);
+CREATE TABLE IF NOT EXISTS menu_items(id TEXT PRIMARY KEY,document_id TEXT NOT NULL,category TEXT NOT NULL,section TEXT,item_name TEXT NOT NULL,description TEXT,price TEXT,dietary_labels TEXT,allergen_labels TEXT,page INTEGER,source_url TEXT NOT NULL,content_date TEXT,confidence REAL NOT NULL);
+CREATE INDEX IF NOT EXISTS menu_items_document ON menu_items(document_id);
+CREATE TABLE IF NOT EXISTS decision_events(id INTEGER PRIMARY KEY,interaction_id INTEGER,session_id TEXT NOT NULL,stage TEXT NOT NULL,detail TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS decision_events_session ON decision_events(session_id);
 """
 
 def now():
@@ -49,6 +53,7 @@ def upsert_document(db, doc):
         return False
     db.execute("DELETE FROM document_chunks WHERE document_id=?", (doc["id"],))
     db.execute("DELETE FROM structured_facts WHERE source_document_id=?", (doc["id"],))
+    db.execute("DELETE FROM menu_items WHERE document_id=?", (doc["id"],))
     db.execute("INSERT OR REPLACE INTO documents VALUES(?,?,?,?,?,?,?,?,?,?,?)", tuple(doc[k] for k in ("id","url","canonical_url","title","content","content_type","crawled_at","last_modified","content_hash","category","source_priority")))
     paragraphs = [p.strip() for p in doc["content"].split("\n") if len(p.strip()) > 30]
     chunk = ""

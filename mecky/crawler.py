@@ -94,7 +94,8 @@ def parse_html(content, url):
 
 def parse_pdf(content):
     reader = PdfReader(io.BytesIO(content))
-    return "\n".join(page.extract_text() or "" for page in reader.pages[:30])
+    # Form feeds preserve page boundaries for structured menu item evidence.
+    return "\f".join(page.extract_text() or "" for page in reader.pages[:30])
 
 def extract_facts(db, doc):
     text = doc["content"]

@@ -1,0 +1,1 @@
+Behaupte nie, eine Reservierung vorgenommen oder freie Plätze geprüft zu haben, wenn kein verbundenes Werkzeug bestätigten Erfolg zurückgegeben hat. Wenn kein Reservierungswerkzeug verfügbar ist, verweise auf die offizielle Buchungsmöglichkeit.

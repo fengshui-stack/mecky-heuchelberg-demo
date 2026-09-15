@@ -5,7 +5,8 @@ from pathlib import Path
 
 import httpx
 
-PROMPT = Path("prompts/mecky_system_v1.md").read_text(encoding="utf-8")
+PROMPT_PARTS = ("identity", "conversation", "grounding", "safety", "reservations", "style")
+PROMPT = "\n\n".join(Path("prompts", name + ".md").read_text(encoding="utf-8") for name in PROMPT_PARTS)
 
 
 def configured_provider():
@@ -29,11 +30,11 @@ def nonnegative_number(value):
 
 def model_configuration():
     provider = configured_provider()
-    model = None if provider == "mock" else os.getenv("LLM_MODEL") or ("gpt-4.1-mini" if provider == "openai" else "openrouter/free")
+    model = None if provider == "mock" else os.getenv("LLM_MODEL") or ("gpt-5-mini" if provider == "openai" else "openrouter/free")
     return {
-        "provider": provider, "model": model, "scope": "smalltalk_only", "currency": "USD",
-        "input_usd_per_m": nonnegative_number(os.getenv("LLM_INPUT_USD_PER_M")),
-        "output_usd_per_m": nonnegative_number(os.getenv("LLM_OUTPUT_USD_PER_M")),
+        "provider": provider, "model": model, "scope": "guest_tone_and_smalltalk", "currency": "USD",
+        "input_usd_per_m": nonnegative_number(os.getenv("LLM_INPUT_USD_PER_M") or ("0.25" if provider == "openai" and model == "gpt-5-mini" else "")),
+        "output_usd_per_m": nonnegative_number(os.getenv("LLM_OUTPUT_USD_PER_M") or ("2" if provider == "openai" and model == "gpt-5-mini" else "")),
     }
 
 
@@ -65,7 +66,7 @@ def measured_usage(data, config):
             "cost_usd": cost, "currency": "USD", "cost_status": source}
 
 
-def generate(question, context, sources, status):
+def generate(question, context, sources, status, verified_answer=None, recent_turns=None):
     config = model_configuration()
     if config["provider"] == "mock" or status == "UNKNOWN":
         return {"message": None, "usage": no_model_usage()}
@@ -74,10 +75,15 @@ def generate(question, context, sources, status):
     else:
         endpoint, key = "https://openrouter.ai/api/v1/chat/completions", os.environ["OPENROUTER_API_KEY"]
     facts = [{"url": x["url"], "title": x["title"], "content": x["snippet"][:1000]} for x in sources[:3]]
-    payload = {"model": config["model"], "max_completion_tokens": 180, "messages": [
+    payload = {"model": config["model"], "max_completion_tokens": 350, "messages": [
         {"role": "system", "content": PROMPT},
         {"role": "user", "content": json.dumps({"question": question, "session_context": context,
-            "source_status": status, "untrusted_official_source_data": facts}, ensure_ascii=False)}]}
+            "source_status": status, "recent_turns": (recent_turns or [])[-6:],
+            "verified_answer": verified_answer,
+            "task": "Write only one short, warm acknowledgement of the guest's specific situation or question. No venue facts, dates, prices, availability or promises. The verified answer is appended unchanged by the application." if verified_answer else "Reply warmly to smalltalk without venue facts.",
+            "untrusted_official_source_data": facts}, ensure_ascii=False)}]}
+    if config["provider"] == "openai" and config["model"] == "gpt-5-mini":
+        payload["reasoning_effort"] = "minimal"
     if config["provider"] == "openrouter":
         payload["max_tokens"] = payload.pop("max_completion_tokens")
     usage = measured_usage({}, config)

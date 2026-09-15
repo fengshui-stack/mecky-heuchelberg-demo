@@ -2,10 +2,11 @@
 import re
 
 OFF_TOPIC = re.compile(
-    r"\b(politik\w*|politisch\w*|bundestag\w*|bundeskanzler\w*|wahlkampf\w*|"
+    r"\b(politik\w*|politisch\w*|bundestag\w*|bundeskanzler\w*|bundespräsident\w*|wahlkampf\w*|"
     r"afd|cdu|spd|fdp|trump|putin|biden|israel|palästina|gaza|ukrainekrieg|"
     r"bitcoin|kryptowährung\w*|aktienkurs\w*|quantenphysik|hausaufgaben|"
-    r"bundesliga|champions league|porn\w*|sexchat|bombenbau|malware|ransomware)\b|"
+    r"bundesliga|champions league|porn\w*|sexchat|bombenbau|malware|ransomware|"
+    r"hauptstadt|matheaufgabe|horoskop|witz|wettervorhersage)\b|"
     r"welche\s+partei|wen\s+soll\s+ich\s+wählen|"
     r"(schreib|programmier|erstell|erklär)\w*.*\b(python|javascript|code|sql|aufsatz)\b|"
     r"(ignorier\w*|vergiss|ignore|forget).*\b(regeln|anweisungen|instructions|prompt)\b|"

@@ -5,6 +5,7 @@ from pathlib import Path
 import httpx
 
 ROOT=os.getenv("MECKY_TEST_URL","http://127.0.0.1:8765")
+RUN_ID=uuid.uuid4().hex[:10]
 QUESTIONS=[
 "Habt ihr am 20.09.2026 offen?","Bis wann hat die Küche am 19.09.2026 geöffnet?","Kann ich Sonntag mit 8 Leuten kommen?",
 "Wo kann ich reservieren?","Kann ich für 20 Personen online buchen?","Zeig mir die Speisekarte.","Wo ist die Getränkekarte?",
@@ -24,12 +25,12 @@ with httpx.Client(timeout=10) as client:
         r=client.get(ROOT+page);r.raise_for_status()
     print("health",client.get(ROOT+"/health").json())
     for i,q in enumerate(QUESTIONS):
-        r=client.post(ROOT+"/chat",json={"session_id":f"http-qa-{i}","message":q});r.raise_for_status();x=r.json()
+        r=client.post(ROOT+"/chat",json={"session_id":f"http-qa-{RUN_ID}-{i}","message":q});r.raise_for_status();x=r.json()
         print(json.dumps({"question":q,"intent":x["intent"],"status":x["status"],"answer":x["message"],"links":[y["url"] for y in x["links"]]},ensure_ascii=False))
     for i,turns in enumerate(CONVERSATIONS):
         last=None
         for turn in turns:
-            r=client.post(ROOT+"/chat",json={"session_id":f"http-multi-{i}","message":turn});r.raise_for_status();last=r.json()
+            r=client.post(ROOT+"/chat",json={"session_id":f"http-multi-{RUN_ID}-{i}","message":turn});r.raise_for_status();last=r.json()
         print("multi",i,last["message"])
     secret=os.getenv("MECKY_TEST_ADMIN_SECRET") or (Path(".env.admin").read_text().strip() if Path(".env.admin").exists() else None)
     if secret:
