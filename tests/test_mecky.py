@@ -69,3 +69,12 @@ def test_manual_rules_and_health(seeded_db):
     health=client.get("/health").json()
     assert health["database"]=="ok" and health["knowledge_index"]=="ready"
     assert client.get("/").status_code==200
+
+def test_admin_secret_file(seeded_db,tmp_path,monkeypatch):
+    file=tmp_path/"mecky_admin_secret"
+    file.write_text("file-secret\n")
+    monkeypatch.delenv("ADMIN_SECRET")
+    monkeypatch.setenv("ADMIN_SECRET_FILE",str(file))
+    client=TestClient(app)
+    assert client.get("/admin/knowledge",headers={"x-admin-secret":"file-secret"}).status_code==200
+    assert client.get("/admin/knowledge",headers={"x-admin-secret":"wrong"}).status_code==401

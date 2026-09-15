@@ -46,6 +46,10 @@ class FeedbackInput(BaseModel):
 def require_admin(secret):
     expected=os.getenv("ADMIN_SECRET","")
     if not expected:
+        path=Path(os.getenv("ADMIN_SECRET_FILE","/etc/secrets/mecky_admin_secret"))
+        if path.is_file():
+            expected=path.read_text(encoding="utf-8").strip()
+    if not expected:
         raise HTTPException(503,"Admin secret is not configured")
     if not secret or not hmac.compare_digest(secret,expected):
         raise HTTPException(401,"Unauthorized")
