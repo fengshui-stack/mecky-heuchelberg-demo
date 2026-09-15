@@ -5,7 +5,9 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from .store import connect, now, stable_id
-from .provider import generate
+from .provider import generate, no_model_usage
+from .usage import record_usage, session_usage
+from .boundaries import is_off_topic, friendly_boundary
 from .manual import find_manual
 
 TZ = ZoneInfo("Europe/Berlin")
@@ -77,6 +79,8 @@ def resolve_date(message, reference=None):
 
 def detect_intent(message, previous=None):
     q=message.lower().strip()
+    if is_off_topic(q): return "OFF_TOPIC"
+    if re.fullmatch(r"(?:hallo|hi|hey|servus|guten (?:tag|morgen|abend)|danke(?: dir| schön)?|vielen dank|super|okay|alles klar|tschüss|bis bald|wie geht(?: es)?(?: dir)?)(?: mecky)?[!.?\s😊🙂🌿]*",q): return "SMALLTALK"
     if ("garten" in q or "draußen" in q) and "regen" in q: return "GARDEN"
     if "kindergeburtstag" in q or "wickel" in q: return "CHILDREN"
     if "biergarten" in q or "bergarten" in q: return "GARDEN"
@@ -91,6 +95,7 @@ def detect_intent(message, previous=None):
         if re.search(pat,q): return intent
     if len(q.split()) <= 4 and previous and (re.search(r"\b(und|auch|dann|dort)\b",q) or resolve_date(q)):
         return previous
+    if previous and re.fullmatch(r"(?:was kostet das|wie teuer(?: ist das)?|wie viel kostet das|geht das|ist das möglich)[?.!]*",q): return previous
     if re.search(r"\b\d+\s*(leute[n]?|personen|gäste)\b|\bwir sind \d+\b",q): return "GROUP"
     return "UNKNOWN"
 
@@ -142,6 +147,14 @@ def month_requested(message):
     names={"januar":1,"februar":2,"märz":3,"april":4,"mai":5,"juni":6,"juli":7,"august":8,"september":9,"oktober":10,"november":11,"dezember":12}
     return next((number for name,number in names.items() if name in message.lower()),None)
 
+def friendly_opening(value, date):
+    days=("Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag")
+    label=f"{days[date.weekday()]}, {date.strftime('%d.%m.%Y')}"
+    hours=re.search(r"(\d{1,2}(?::\d{2})?) bis (\d{1,2}(?::\d{2})?) Uhr",value)
+    if hours and not re.search(r"geschlossen|nur|ausnahm|außer",value,re.I):
+        return f"Am {label}, sind wir von {hours[1]} bis {hours[2]} Uhr für euch da."
+    return f"Für {label}, gilt bei uns: {value.rstrip('.')}."
+
 def session(db, sid):
     row=db.execute("SELECT context,updated_at FROM sessions WHERE id=?",(sid,)).fetchone()
     if not row: return {}
@@ -162,29 +175,30 @@ def chat(sid, message):
     context=session(db,sid)
     previous=context.get("intent")
     intent=detect_intent(message,previous)
-    if intent=="UNKNOWN" and previous and len(message.split())<=4:
-        intent=previous
     category=CAT.get(intent,"other")
-    date=resolve_date(message)
+    date=resolve_date(message) if intent!="OFF_TOPIC" else None
     if date: context["date"]=date.isoformat()
     elif context.get("date") and intent in ("OPENING_HOURS","KITCHEN_HOURS","RESERVATION"):
         from datetime import date as date_type
         date=date_type.fromisoformat(context["date"])
     group=re.search(r"\b(\d{1,3})\s*(?:leute[n]?|personen|gäste)\b|\bwir sind\s+(\d{1,3})\b",message.lower())
-    if group: context["party_size"]=int(group[1] or group[2])
-    if intent!="UNKNOWN": context["intent"]=intent
-    admin=current_admin(db,category,date)
-    manual=find_manual(db,message,intent)
-    sources=retrieve(db,message,intent)
-    link=source_link(db,intent)
+    if group and intent!="OFF_TOPIC": context["party_size"]=int(group[1] or group[2])
+    if intent not in ("UNKNOWN","OFF_TOPIC","SMALLTALK"): context["intent"]=intent
+    admin=current_admin(db,category,date) if intent!="OFF_TOPIC" else None
+    manual=find_manual(db,message,intent) if intent!="OFF_TOPIC" else None
+    sources=retrieve(db,message,intent) if intent!="OFF_TOPIC" else []
+    link=source_link(db,intent) if intent!="OFF_TOPIC" else None
     links=[]
     status="UNKNOWN"
     answer=None
-    if admin:
+    if intent=="OFF_TOPIC":
+        answer=friendly_boundary(message)
+        status="KNOWN"
+    elif admin:
         answer=admin["value"]
         status="KNOWN"
     elif intent=="DOGS" and db.execute("SELECT 1 FROM manual_knowledge WHERE section='Hausregeln Hunde'").fetchone():
-        answer="Ja, Hunde sind willkommen. Bitte nehmt sie an die Leine."
+        answer="Na klar, euer Hund ist bei uns willkommen! Bitte nehmt ihn an die Leine, damit sich alle Gäste wohlfühlen."
         status="KNOWN";links=[{"url":CONTACT,"title":"Bei Fragen: Kontakt"}]
     elif intent=="PAYMENT" and db.execute("SELECT 1 FROM manual_knowledge WHERE section='Zahlungsarten'").fetchone():
         answer="Ihr könnt bar oder mit EC-Karte zahlen. Bei Kreditkarten sind Visa und Mastercard möglich."
@@ -209,7 +223,7 @@ def chat(sid, message):
         answer="Jobs und Ausbildungsmöglichkeiten findest du auf unserer Karriereseite."
         status="PARTIAL";links=[{"url":"https://heuchelberg.com/karriere-heuchelberger-warte-heilbronn/","title":"Karriere"}]
     elif intent=="CHILDREN" and "kindergeburtstag" in message.lower() and db.execute("SELECT 1 FROM manual_knowledge WHERE section='Bankette und größere Feiern'").fetchone():
-        answer="Kindergeburtstage sind bei uns laut den Team-Informationen nicht möglich."
+        answer="Schön, dass ihr an uns denkt! Kindergeburtstage sind bei uns leider nicht möglich."
         status="KNOWN";links=[{"url":CONTACT,"title":"Kontakt"}]
     elif intent=="RESERVATION" and re.search(r"bestimmte[nr]? tisch|tischwunsch",message.lower()) and db.execute("SELECT 1 FROM manual_knowledge WHERE section='Tischwünsche und Kinderwagen'").fetchone():
         answer="Einen bestimmten Tisch könnt ihr leider nicht fest reservieren. Das Team vergibt die Plätze passend zur Personenzahl und Verfügbarkeit."
@@ -237,7 +251,7 @@ def chat(sid, message):
                     timing=fact["value"]
                 answer=f"Am {date.strftime('%d.%m.%Y')} hat die Küche laut Website {timing} geöffnet. Bei kaltem oder schlechtem Wetter kann sie früher schließen."
             else:
-                answer=f"Am {date.strftime('%d.%m.%Y')} gilt laut aktueller Website: {fact['value'].rstrip('.')}."
+                answer=friendly_opening(fact["value"],date)
             status="KNOWN";links=[{"url":fact["source_url"],"title":"Öffnungszeiten"}]
         elif not date and month_requested(message):
             requested=month_requested(message)
@@ -280,7 +294,7 @@ def chat(sid, message):
         party=context.get("party_size")
         fact=hours_fact(db,"opening_hours",date) if date else None
         if fact:
-            answer=f"Am {date.strftime('%d.%m.%Y')} gilt laut Website: {fact['value'].rstrip('.')}."
+            answer=friendly_opening(fact["value"],date)
             status="KNOWN";links=[{"url":fact["source_url"],"title":"Öffnungszeiten"}]
             if party:
                 answer+=f" Für {party} Personen könnt ihr euren Tisch vorab reservieren; freie Zeiten stehen im Buchungssystem."
@@ -310,7 +324,7 @@ def chat(sid, message):
             status="KNOWN";links=[{"url":"https://heuchelberg.com/","title":"Anfahrt"}]
     elif intent=="CONTACT":
         if db.execute("SELECT 1 FROM structured_facts WHERE subject='email'").fetchone():
-            answer="Das Team erreicht ihr per E-Mail an info@heuchelberg.com oder telefonisch unter 07131 401849."
+            answer="Das Team hilft euch gern weiter! Ihr erreicht uns per E-Mail an info@heuchelberg.com oder telefonisch unter 07131 401849."
             status="KNOWN";links=[{"url":CONTACT,"title":"Kontakt"}]
     elif intent=="MENU":
         if "gluten" in message.lower() and db.execute("SELECT 1 FROM manual_knowledge WHERE section='Glutenfrei'").fetchone():
@@ -353,17 +367,25 @@ def chat(sid, message):
         answer=manual["value"][:450]
         status="PARTIAL";links=[{"url":manual["source_url"],"title":"Mehr Informationen"}] if manual["source_url"] and manual["source_url"].startswith("https://") else [{"url":CONTACT,"title":"Kontakt"}]
     elif intent=="SMALLTALK":
-        answer="Hallo! Schön, dass du da bist. Was möchtest du über die Heuchelberger Warte wissen?" if re.search(r"hi|hey|hallo|guten tag|servus",message.lower()) else "Gern! Wenn du noch etwas wissen möchtest, schreib einfach."
+        if re.search(r"danke|super|okay|alles klar",message,re.I):
+            answer="Sehr gern! Wenn noch etwas offen ist, schreib mir einfach. 🌿"
+        elif re.search(r"tschüss|bis bald",message,re.I):
+            answer="Bis bald! Ich wünsche dir einen schönen Tag – und vielleicht sehen wir uns ja auf dem Berg. 🌿"
+        else:
+            answer="Servus! Schön, dass du da bist. Ich bin Mecky, dein digitaler Gastgeber. Wie kann ich dir bei eurem Besuch auf dem Heuchelberg helfen?"
         status="KNOWN"
     if not answer:
-        answer="Dazu finde ich gerade keine eindeutige Info auf der offiziellen Seite. Am besten fragst du kurz direkt beim Team nach."
+        answer="Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
         links=[{"url":CONTACT,"title":"Kontakt"}]
         status="UNKNOWN"
     # Only free-form smalltalk uses an optional model. Operational claims keep
     # their deterministic, source-grounded answer even when a model is set.
+    usage=no_model_usage()
     if intent=="SMALLTALK":
-        model_answer=generate(message,context,[],status)
-        if model_answer and not re.search(r"\d|https?://|€|geöffnet|reservier",model_answer,re.I):
+        generated=generate(message,context,[],status)
+        model_answer=generated["message"]
+        usage=generated["usage"]
+        if model_answer and not is_off_topic(model_answer) and not re.search(r"\d|https?://|€|geöffnet|reservier",model_answer,re.I):
             answer=model_answer
     confidence={"KNOWN":0.96,"PARTIAL":0.65,"UNKNOWN":0.0}[status]
     db.execute("INSERT OR REPLACE INTO sessions VALUES(?,?,?)",(sid,json.dumps(context),now()))
@@ -372,6 +394,8 @@ def chat(sid, message):
     latency=int((time.monotonic()-start)*1000)
     cursor=db.execute("INSERT INTO interactions(session_id,intent,confidence,sources,answer,latency_ms,status,created_at) VALUES(?,?,?,?,?,?,?,?)",(sid,intent,confidence,json.dumps([x["url"] for x in sources[:3]]),answer,latency,status,now()))
     iid=cursor.lastrowid
+    record_usage(db,sid,iid,usage)
+    totals=session_usage(db,sid)
     if status=="UNKNOWN":
         safe=redact_example(message)
         topic=re.sub(r"\s+"," ",safe.lower().strip())[:80]
@@ -381,4 +405,4 @@ def chat(sid, message):
         if safe not in examples: examples=(examples+[safe])[-5:]
         db.execute("INSERT OR REPLACE INTO knowledge_gaps VALUES(?,?,?,?,?,?)",(gid,topic,(old[0]+1 if old else 1),json.dumps(examples),"needs_admin_answer",now()))
     db.commit();db.close()
-    return {"session_id":sid,"message":answer,"links":links,"confidence":confidence,"intent":intent,"status":status,"interaction_id":iid}
+    return {"session_id":sid,"message":answer,"links":links,"confidence":confidence,"intent":intent,"status":status,"interaction_id":iid,"usage":usage,"session_usage":totals,"latency_ms":latency}

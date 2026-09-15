@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS feedback(id INTEGER PRIMARY KEY,interaction_id INTEGE
 CREATE TABLE IF NOT EXISTS knowledge_gaps(id TEXT PRIMARY KEY,topic TEXT,occurrences INTEGER,example_questions TEXT,status TEXT,updated_at TEXT);
 CREATE TABLE IF NOT EXISTS crawl_runs(id INTEGER PRIMARY KEY,started_at TEXT,finished_at TEXT,documents_seen INTEGER,documents_changed INTEGER,errors TEXT);
 CREATE TABLE IF NOT EXISTS llm_usage(id INTEGER PRIMARY KEY,provider TEXT,model TEXT,tokens_input INTEGER,tokens_output INTEGER,estimated_cost REAL,created_at TEXT);
+CREATE TABLE IF NOT EXISTS interaction_usage(interaction_id INTEGER PRIMARY KEY,session_id TEXT NOT NULL,usage TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS interaction_usage_session ON interaction_usage(session_id);
 """
 
 def now():

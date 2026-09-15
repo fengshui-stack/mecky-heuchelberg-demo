@@ -1,13 +1,13 @@
 import sqlite3
 from pathlib import Path
-from mecky.store import DB_PATH
+from mecky.store import connect
 
 SEED=Path("data/seed.db")
 SEED.parent.mkdir(exist_ok=True)
-source=sqlite3.connect(DB_PATH)
+source=connect()
 target=sqlite3.connect(SEED)
 source.backup(target)
-for table in ("sessions","conversation_messages","user_memory","interactions","feedback","knowledge_gaps","admin_knowledge","llm_usage"):
+for table in ("sessions","conversation_messages","user_memory","interactions","feedback","knowledge_gaps","admin_knowledge","llm_usage","interaction_usage"):
     target.execute(f"DELETE FROM {table}")
 target.commit()
 target.execute("VACUUM")

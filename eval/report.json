@@ -5,8 +5,8 @@
   "unknown": 8,
   "link_correctness": 1.0,
   "prohibited_claim_rate": 0.0,
-  "median_latency_ms": 2,
-  "p95_latency_ms": 3,
+  "median_latency_ms": 3,
+  "p95_latency_ms": 4,
   "limitations": "Automated checks cover links and prohibited phrases; human review is needed for factual correctness and naturalness.",
   "failures": []
 }

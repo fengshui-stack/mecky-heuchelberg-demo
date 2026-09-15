@@ -2,6 +2,7 @@ const form=document.getElementById('chat-form');
 const input=document.getElementById('message');
 const messages=document.getElementById('messages');
 const suggestions=document.getElementById('suggestions');
+let busy=false;
 let sid=sessionStorage.getItem('mecky-session')||null;
 function bubble(role,text,links=[],id){
   const box=document.createElement('div');box.className='bubble '+role;
@@ -12,10 +13,10 @@ function bubble(role,text,links=[],id){
   messages.append(box);messages.scrollTop=messages.scrollHeight;return box;
 }
 async function send(text){
-  text=text.trim();if(!text)return;input.value='';suggestions.style.display='none';bubble('user',text);input.disabled=true;
-  const pending=bubble('mecky','Mecky schaut nach …');
-  try{const r=await fetch('/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:sid,message:text})});if(!r.ok)throw new Error('Die Anfrage ist gerade nicht möglich.');const data=await r.json();sid=data.session_id;sessionStorage.setItem('mecky-session',sid);pending.remove();bubble('mecky',data.message,data.links,data.interaction_id)}
-  catch(e){pending.remove();bubble('mecky','Gerade klappt die Verbindung nicht. Versuch es bitte gleich noch einmal.')}finally{input.disabled=false;input.focus()}
+  text=text.trim();if(!text||busy)return;busy=true;input.value='';suggestions.style.display='none';bubble('user',text);input.disabled=true;
+  const pending=bubble('mecky','Mecky liest deine Nachricht …');
+  try{const r=await fetch('/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:sid,message:text})});if(!r.ok)throw new Error('Die Anfrage ist gerade nicht möglich.');const data=await r.json();sid=data.session_id;sessionStorage.setItem('mecky-session',sid);pending.lastElementChild.textContent='Mecky schreibt …';await new Promise(resolve=>setTimeout(resolve,Math.min(2800,900+data.message.length*7)));pending.remove();bubble('mecky',data.message,data.links,data.interaction_id)}
+  catch(e){pending.remove();bubble('mecky','Gerade klappt die Verbindung nicht. Versuch es bitte gleich noch einmal.')}finally{busy=false;input.disabled=false;input.focus()}
 }
 form.addEventListener('submit',e=>{e.preventDefault();send(input.value)});
 suggestions.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>send(b.textContent)));

@@ -2,6 +2,8 @@
 
 Mecky ist eine kanalunabhängige Chat-Engine mit einer responsiven Web-Demo. Sie beantwortet belegte Betriebsfragen zuerst, verlinkt anschließend die passende offizielle Seite und sagt offen, wenn ein Termin, Preis oder eine Regel nicht bestätigt ist. Die Demo läuft ohne LLM-Kosten; OpenAI und OpenRouter sind optional.
 
+**Messenger-Kundentest:** https://mecky-kundentest.ben-fenger.chatgpt.site/
+
 **Öffentliche Demo:** https://mecky-heuchelberg-demo.onrender.com/ · **Quellcode:** https://github.com/fengshui-stack/mecky-heuchelberg-demo
 
 ## Schnellstart
@@ -49,13 +51,23 @@ Team-Wissen lässt sich über `POST /admin/knowledge`, `GET /admin/knowledge`, `
 
 ## Modell und Kosten
 
-`LLM_PROVIDER=mock` ist der kostenlose Standard. Die belegten Betriebsantworten werden deterministisch formuliert. Optional sind `LLM_PROVIDER=openai` mit `OPENAI_API_KEY` oder `LLM_PROVIDER=openrouter` mit `OPENROUTER_API_KEY` und `LLM_MODEL`. In V1 nutzt Mecky ein Modell nur für Smalltalk; operative Antworten bleiben aus Sicherheitsgründen auch bei konfiguriertem Modell quellengebunden. Der Prompt liegt versioniert in `prompts/mecky_system_v1.md`; Website-Text ist ausdrücklich untrusted source content. Die Datenbank enthält eine separate `llm_usage`-Tabelle für Provider, Modell, Tokenzahlen und geschätzte Kosten. Für eine Kostenschätzung können `LLM_INPUT_USD_PER_M` und `LLM_OUTPUT_USD_PER_M` gesetzt werden; ohne Tarife wird 0 gespeichert. Der sichere Mock-Modus führt keine Modellanfragen aus.
+`LLM_PROVIDER=mock` ist der kostenlose Standard. Die belegten Betriebsantworten werden deterministisch formuliert. Optional sind `LLM_PROVIDER=openai` mit `OPENAI_API_KEY` oder `LLM_PROVIDER=openrouter` mit `OPENROUTER_API_KEY` und `LLM_MODEL`. In V1 nutzt Mecky ein Modell nur für Smalltalk; operative Antworten bleiben aus Sicherheitsgründen auch bei konfiguriertem Modell quellengebunden. Der Prompt liegt versioniert in `prompts/mecky_system_v1.md`; Website-Text ist ausdrücklich untrusted source content. Die Datenbank enthält eine separate `llm_usage`-Tabelle für Provider, Modell, Tokenzahlen und geschätzte Kosten. Für eine Kostenschätzung können `LLM_INPUT_USD_PER_M` und `LLM_OUTPUT_USD_PER_M` gesetzt werden; ohne Tarife bleibt der Preis unbekannt. `/model` liefert das konfigurierte Modell und die Eingabe-/Ausgabepreise pro Million Tokens. Jede `/chat`-Antwort enthält `usage` für die einzelne Antwort und `session_usage` für das Gespräch. Anbieter-gemeldete Kosten haben Vorrang; alternativ werden reale Tokenzahlen mit den konfigurierten USD-Tarifen multipliziert und ausdrücklich als Schätzung markiert. Cache-Rabatte und weitere Sondertarife sind in dieser einfachen Schätzung nicht berücksichtigt. Fehlende Nutzungsdaten, Timeouts und unbekannte Preise bleiben sichtbar unbekannt; auch verworfene Modellantworten zählen zum Verbrauch. Die Tokenmessung folgt der [OpenRouter Usage Accounting-Dokumentation](https://openrouter.ai/docs/cookbook/administration/usage-accounting) und der [OpenAI Chat-Completions-Referenz](https://developers.openai.com/api/reference/resources/chat/subresources/completions). Der sichere Mock-Modus führt keine Modellanfragen aus.
+
+## Messenger-Kundentest
+
+Die zusätzliche Sites-Seite bietet ein WhatsApp-ähnliches Testgespräch mit Quellenlinks, Feedback, neuem Chat und sichtbaren Modellkosten. Am Desktop steht der Tokenzähler neben dem Chat; mobil öffnet „Kosten“ die Verbrauchsansicht. Die Anzeige nutzt die echten `/chat`-Nutzungsdaten, keine aus Zeichenlängen erfundenen Tokens. Im regelbasierten Modus sind Modell-Tokens und Modellkosten null. API-Schlüssel bleiben im Backend; Kunden können keine kostenpflichtigen Modelle aktivieren.
+
+Mecky zeigt zunächst einen Lesehinweis und anschließend „schreibt …“. Vor der Anzeige liegt eine kurze, von der Antwortlänge abhängige Pause zwischen 0,9 und 2,8 Sekunden. Diese UI-Pause erzeugt keine Tokens und ist unabhängig von der gemessenen Backend-Verarbeitung. Politik, Programmieraufträge und andere erkannte fachfremde Themen werden freundlich abgegrenzt, bevor Quellen oder ein Modell aufgerufen werden. Der vorherige Besuchskontext bleibt erhalten.
+
+Die Sites-Quellen liegen lokal in `customer-site/` mit eigener Versionsverwaltung. `MECKY_ALLOWED_ORIGINS` erlaubt die veröffentlichte Sites-Origin; für lokale Entwicklung laufen die statische Seite auf Port 8787 und die API auf Port 8788. Die lokale Origin muss dann zusätzlich erlaubt werden.
 
 ## Evaluation
 
 `eval/questions.jsonl` enthält 130 realistische Einzelanfragen samt Kategorie, erwarteter Quelle, nicht zu behauptenden Aussagen und Confidence-Erwartung. `scripts/evaluate.py` schreibt `eval/report.json` mit Linkprüfung, Statusverteilung, verbotenen Behauptungen und Latenz. Das ist ein automatischer Smoke-Test; er ersetzt keine menschliche Faktenprüfung. `tests/test_mecky.py` deckt fünf mehrstufige Gespräche, Datumsauflösung, operative Halluzinationsfallen, manuelle Regeln, Feedback und den gesamten Admin-Override-Zyklus ab. `scripts/http_qa.py` prüft zusätzlich 20 Fragen und fünf Gesprächsfolgen gegen einen gestarteten Server.
 
 Am 15.09.2026 bestanden sechs Pytest-Tests, der 130-Fragen-Smoke-Test und die HTTP-Prüfung der öffentlichen Render-Demo einschließlich Admin-Override und Deaktivierung. Der erste Live-Index enthielt 83 offizielle Dokumente und 53 Abschnitte aus der Team-RAG-Datei. Browser-Sichtprüfung erfolgte in Desktop- und Mobilgröße.
+
+Die Erweiterung ergänzt Regressionstests für Preisberechnung, Anbieter-Kosten, Session-Trennung, fehlende Preise/Nutzungsdaten, Timeouts, verworfene Modellantworten und Themenabgrenzung. Alle 13 Tests bestanden. Die WebMCP-Aktionen zum Senden und Lesen des Verbrauchs wurden mit gültigen und ungültigen Eingaben gegen den lokalen Chatbot geprüft.
 
 ## Deployment
 

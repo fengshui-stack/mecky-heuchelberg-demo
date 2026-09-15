@@ -15,7 +15,7 @@ from .engine import chat
 from .store import connect, now, stable_id
 
 app=FastAPI(title="Mecky Demo",version="0.1.0")
-origins=[x.strip() for x in os.getenv("MECKY_ALLOWED_ORIGINS","").split(",") if x.strip()]
+origins=[x.strip() for x in os.getenv("MECKY_ALLOWED_ORIGINS","https://mecky-kundentest.ben-fenger.chatgpt.site").split(",") if x.strip()]
 if origins:
     app.add_middleware(CORSMiddleware,allow_origins=origins,allow_methods=["GET","POST","PATCH","DELETE"],allow_headers=["content-type","x-admin-secret"])
 
@@ -65,10 +65,17 @@ def health():
 
 @app.post("/chat")
 def chat_route(body:ChatInput):
+    if not body.message.strip():
+        raise HTTPException(422,"Message must not be blank")
     sid=body.session_id or secrets.token_urlsafe(18)
     if not sid.replace("-","").replace("_","").isalnum():
         raise HTTPException(422,"Invalid session ID")
     return chat(sid,body.message.strip())
+
+@app.get("/model")
+def model_info():
+    from .provider import model_configuration
+    return model_configuration()
 
 @app.post("/feedback")
 def feedback(body:FeedbackInput):
