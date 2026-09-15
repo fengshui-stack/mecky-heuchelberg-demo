@@ -2,6 +2,8 @@
 
 Mecky ist eine kanalunabhängige Chat-Engine mit einer responsiven Web-Demo. Sie beantwortet belegte Betriebsfragen zuerst, verlinkt anschließend die passende offizielle Seite und sagt offen, wenn ein Termin, Preis oder eine Regel nicht bestätigt ist. Die Demo läuft ohne LLM-Kosten; OpenAI und OpenRouter sind optional.
 
+**Öffentliche Demo:** https://mecky-heuchelberg-demo.onrender.com/ · **Quellcode:** https://github.com/fengshui-stack/mecky-heuchelberg-demo
+
 ## Schnellstart
 
 Python 3.12 oder neuer wird benötigt.
@@ -52,6 +54,8 @@ Team-Wissen lässt sich über `POST /admin/knowledge`, `GET /admin/knowledge`, `
 ## Evaluation
 
 `eval/questions.jsonl` enthält 130 realistische Einzelanfragen samt Kategorie, erwarteter Quelle, nicht zu behauptenden Aussagen und Confidence-Erwartung. `scripts/evaluate.py` schreibt `eval/report.json` mit Linkprüfung, Statusverteilung, verbotenen Behauptungen und Latenz. Das ist ein automatischer Smoke-Test; er ersetzt keine menschliche Faktenprüfung. `tests/test_mecky.py` deckt fünf mehrstufige Gespräche, Datumsauflösung, operative Halluzinationsfallen, manuelle Regeln, Feedback und den gesamten Admin-Override-Zyklus ab. `scripts/http_qa.py` prüft zusätzlich 20 Fragen und fünf Gesprächsfolgen gegen einen gestarteten Server.
+
+Am 15.09.2026 bestanden sechs Pytest-Tests, der 130-Fragen-Smoke-Test und die HTTP-Prüfung der öffentlichen Render-Demo einschließlich Admin-Override und Deaktivierung. Der erste Live-Index enthielt 83 offizielle Dokumente und 53 Abschnitte aus der Team-RAG-Datei. Browser-Sichtprüfung erfolgte in Desktop- und Mobilgröße.
 
 ## Deployment
 

@@ -237,7 +237,7 @@ def chat(sid, message):
                     timing=fact["value"]
                 answer=f"Am {date.strftime('%d.%m.%Y')} hat die Küche laut Website {timing} geöffnet. Bei kaltem oder schlechtem Wetter kann sie früher schließen."
             else:
-                answer=f"Am {date.strftime('%d.%m.%Y')} gilt laut aktueller Website: {fact['value']}"
+                answer=f"Am {date.strftime('%d.%m.%Y')} gilt laut aktueller Website: {fact['value'].rstrip('.')}."
             status="KNOWN";links=[{"url":fact["source_url"],"title":"Öffnungszeiten"}]
         elif not date and month_requested(message):
             requested=month_requested(message)
@@ -248,7 +248,7 @@ def chat(sid, message):
             if category=="kitchen_hours":
                 row=db.execute("SELECT * FROM structured_facts WHERE category='kitchen_hours' AND subject=? AND valid_from LIKE ? LIMIT 1",(month,f"{year}-%")).fetchone()
                 if row:
-                    answer=f"Im {month.title()} gilt laut Website: {row['value']} Bei schlechtem Wetter kann die Küche früher schließen."
+                    answer=f"Im {month.title()} gilt laut Website: {row['value'].rstrip('.')}. Bei schlechtem Wetter kann die Küche früher schließen."
                     status="KNOWN";links=[{"url":row["source_url"],"title":"Küchenzeiten"}]
             else:
                 rows={x["subject"].split(":")[-1]:x for x in db.execute("SELECT * FROM structured_facts WHERE category='opening_hours' AND subject LIKE ? AND valid_from LIKE ?",(month+":%",f"{year}-%"))}
@@ -280,7 +280,7 @@ def chat(sid, message):
         party=context.get("party_size")
         fact=hours_fact(db,"opening_hours",date) if date else None
         if fact:
-            answer=f"Am {date.strftime('%d.%m.%Y')} gilt laut Website: {fact['value']}"
+            answer=f"Am {date.strftime('%d.%m.%Y')} gilt laut Website: {fact['value'].rstrip('.')}."
             status="KNOWN";links=[{"url":fact["source_url"],"title":"Öffnungszeiten"}]
             if party:
                 answer+=f" Für {party} Personen könnt ihr euren Tisch vorab reservieren; freie Zeiten stehen im Buchungssystem."

@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from pathlib import Path
 import httpx
 
 ROOT=os.getenv("MECKY_TEST_URL","http://127.0.0.1:8765")
@@ -30,7 +31,7 @@ with httpx.Client(timeout=10) as client:
         for turn in turns:
             r=client.post(ROOT+"/chat",json={"session_id":f"http-multi-{i}","message":turn});r.raise_for_status();last=r.json()
         print("multi",i,last["message"])
-    secret=os.getenv("MECKY_TEST_ADMIN_SECRET")
+    secret=os.getenv("MECKY_TEST_ADMIN_SECRET") or (Path(".env.admin").read_text().strip() if Path(".env.admin").exists() else None)
     if secret:
         day="2026-09-20"
         headers={"x-admin-secret":secret}
