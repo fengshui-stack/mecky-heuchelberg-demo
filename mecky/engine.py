@@ -46,6 +46,21 @@ def resolve_date(message, reference=None):
     if "übermorgen" in q: return today+timedelta(days=2)
     if "morgen" in q: return today+timedelta(days=1)
     if "heute" in q: return today
+    if "wochenende" in q:
+        delta=(5-today.weekday())%7
+        if delta==0: delta=7
+        return today+timedelta(days=delta)
+    if "weihnachten" in q:
+        from datetime import date
+        year=today.year if today.month<12 or (today.month==12 and today.day<=25) else today.year+1
+        return date(year,12,25)
+    if "silvester" in q:
+        from datetime import date
+        return date(today.year if today.month<12 or today.day<=31 else today.year+1,12,31)
+    if "neujahr" in q:
+        from datetime import date
+        year=today.year+1 if today.month>1 or today.day>1 else today.year
+        return date(year,1,1)
     m=re.search(r"\b(\d{1,2})\.(\d{1,2})\.(\d{4})?",q)
     if m:
         from datetime import date
@@ -99,11 +114,13 @@ def source_link(db, intent):
 def retrieve(db, message, intent):
     cat=CAT.get(intent)
     tokens=[t for t in re.findall(r"[\wäöüß]+",message.lower()) if len(t)>3 and t not in ("habt","kann","euch","oder","morgen","heute","sonntag","samstag","bitte")][:5]
+    expansion={"OPENING_HOURS":["öffnungszeiten","geöffnet"],"MENU":["speisekarte","speisen"],"PARKING":["parkplatz","anfahrt"],"SHUTTLE":["hupfer","shuttle"],"WEDDING":["hochzeit","heiraten"],"CHILDREN":["kinderaktivitäten","ponyreiten"]}
+    tokens=list(dict.fromkeys(tokens+expansion.get(intent,[])))[:7]
     rows=[]
     if tokens:
         query=" OR ".join('"'+t.replace('"','')+'"' for t in tokens)
         try:
-            rows=db.execute("SELECT d.url,d.title,d.category,c.content AS snippet,bm25(chunks_fts) score FROM chunks_fts JOIN document_chunks c ON c.rowid=chunks_fts.rowid JOIN documents d ON d.id=c.document_id WHERE chunks_fts MATCH ? ORDER BY CASE WHEN d.category=? THEN 0 ELSE 1 END,score LIMIT 5",(query,cat or "other")).fetchall()
+            rows=db.execute("SELECT d.url,d.title,d.category,c.content AS snippet,bm25(chunks_fts) score FROM chunks_fts JOIN document_chunks c ON c.rowid=chunks_fts.rowid JOIN documents d ON d.id=c.document_id WHERE chunks_fts MATCH ? ORDER BY CASE WHEN d.category=? THEN 0 ELSE 1 END,d.source_priority,score LIMIT 5",(query,cat or "other")).fetchall()
         except Exception: pass
     if not rows and cat:
         rows=db.execute("SELECT d.url,d.title,d.category,c.content AS snippet,0 score FROM documents d JOIN document_chunks c ON c.document_id=d.id WHERE d.category=? ORDER BY CASE WHEN d.content_type='html' THEN 0 ELSE 1 END LIMIT 3",(cat,)).fetchall()
@@ -121,9 +138,23 @@ def hours_fact(db, category, date):
     if exact and category=="opening_hours": return exact
     return db.execute("SELECT * FROM structured_facts WHERE category=? AND subject IN (?,?) AND valid_from<=? AND valid_until>=? ORDER BY CASE WHEN subject=? THEN 0 ELSE 1 END LIMIT 1",(category,key,month,date.isoformat(),date.isoformat(),key)).fetchone()
 
+def month_requested(message):
+    names={"januar":1,"februar":2,"märz":3,"april":4,"mai":5,"juni":6,"juli":7,"august":8,"september":9,"oktober":10,"november":11,"dezember":12}
+    return next((number for name,number in names.items() if name in message.lower()),None)
+
 def session(db, sid):
-    row=db.execute("SELECT context FROM sessions WHERE id=?",(sid,)).fetchone()
-    return json.loads(row[0]) if row else {}
+    row=db.execute("SELECT context,updated_at FROM sessions WHERE id=?",(sid,)).fetchone()
+    if not row: return {}
+    try:
+        if datetime.fromisoformat(row["updated_at"]) < datetime.fromisoformat(now())-timedelta(hours=24):
+            return {}
+    except (ValueError,TypeError): return {}
+    return json.loads(row["context"])
+
+def redact_example(message):
+    message=re.sub(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}","[email]",message)
+    message=re.sub(r"\+?\d[\d\s()/-]{7,}\d","[phone]",message)
+    return message[:180]
 
 def chat(sid, message):
     start=time.monotonic()
@@ -186,7 +217,13 @@ def chat(sid, message):
     elif intent in ("OPENING_HOURS","KITCHEN_HOURS"):
         fact=hours_fact(db,category,date) if date else None
         opening=hours_fact(db,"opening_hours",date) if category=="kitchen_hours" and date else None
-        if category=="kitchen_hours" and opening and any(x in opening["value"].lower() for x in ("geschlossen","nur für veranstaltungen","nur vorbestellte")):
+        if category=="opening_hours" and date and "wochenende" in message.lower():
+            sunday=date+timedelta(days=1)
+            second=hours_fact(db,"opening_hours",sunday)
+            if fact and second:
+                answer=f"Am Samstag {date.strftime('%d.%m.')} gilt: {fact['value']}; am Sonntag {sunday.strftime('%d.%m.')} gilt: {second['value']}."
+                status="KNOWN";links=[{"url":fact["source_url"],"title":"Öffnungszeiten"}]
+        elif category=="kitchen_hours" and opening and any(x in opening["value"].lower() for x in ("geschlossen","nur für veranstaltungen","nur vorbestellte")):
             answer=f"Am {date.strftime('%d.%m.%Y')} gibt es für reguläre Gäste keine bestätigte Küchenöffnungszeit; laut Website ist der Betrieb nur für vorbestellte Veranstaltungen offen."
             status="PARTIAL";links=[{"url":opening["source_url"],"title":"Öffnungszeiten"}]
         elif fact:
@@ -202,6 +239,25 @@ def chat(sid, message):
             else:
                 answer=f"Am {date.strftime('%d.%m.%Y')} gilt laut aktueller Website: {fact['value']}"
             status="KNOWN";links=[{"url":fact["source_url"],"title":"Öffnungszeiten"}]
+        elif not date and month_requested(message):
+            requested=month_requested(message)
+            current=datetime.now(TZ).date()
+            year=current.year if requested>=current.month else current.year+1
+            months={1:"JANUAR",2:"FEBRUAR",3:"MÄRZ",4:"APRIL",5:"MAI",6:"JUNI",7:"JULI",8:"AUGUST",9:"SEPTEMBER",10:"OKTOBER",11:"NOVEMBER",12:"DEZEMBER"}
+            month=months[requested]
+            if category=="kitchen_hours":
+                row=db.execute("SELECT * FROM structured_facts WHERE category='kitchen_hours' AND subject=? AND valid_from LIKE ? LIMIT 1",(month,f"{year}-%")).fetchone()
+                if row:
+                    answer=f"Im {month.title()} gilt laut Website: {row['value']} Bei schlechtem Wetter kann die Küche früher schließen."
+                    status="KNOWN";links=[{"url":row["source_url"],"title":"Küchenzeiten"}]
+            else:
+                rows={x["subject"].split(":")[-1]:x for x in db.execute("SELECT * FROM structured_facts WHERE category='opening_hours' AND subject LIKE ? AND valid_from LIKE ?",(month+":%",f"{year}-%"))}
+                if rows:
+                    pieces=[]
+                    for weekday,label in (("Sunday","sonntags"),("Saturday","samstags"),("Wednesday","mittwochs bis freitags"),("Monday","montags und dienstags")):
+                        if weekday in rows: pieces.append(label+" "+rows[weekday]["value"].lower())
+                    answer=f"Im {month.title()} nennt die Website: "+"; ".join(pieces)+". Sondertage können abweichen."
+                    status="KNOWN";links=[{"url":"https://heuchelberg.com/","title":"Öffnungszeiten"}]
         else:
             answer="Dazu finde ich gerade keine eindeutige aktuelle Zeitangabe. Frag am besten kurz direkt beim Team nach."
             links=[{"url":CONTACT,"title":"Kontakt"}]
@@ -317,11 +373,12 @@ def chat(sid, message):
     cursor=db.execute("INSERT INTO interactions(session_id,intent,confidence,sources,answer,latency_ms,status,created_at) VALUES(?,?,?,?,?,?,?,?)",(sid,intent,confidence,json.dumps([x["url"] for x in sources[:3]]),answer,latency,status,now()))
     iid=cursor.lastrowid
     if status=="UNKNOWN":
-        topic=re.sub(r"\s+"," ",message.lower().strip())[:80]
+        safe=redact_example(message)
+        topic=re.sub(r"\s+"," ",safe.lower().strip())[:80]
         gid=stable_id(topic)
         old=db.execute("SELECT occurrences,example_questions FROM knowledge_gaps WHERE id=?",(gid,)).fetchone()
         examples=json.loads(old[1]) if old else []
-        if message not in examples: examples=(examples+[message])[-5:]
+        if safe not in examples: examples=(examples+[safe])[-5:]
         db.execute("INSERT OR REPLACE INTO knowledge_gaps VALUES(?,?,?,?,?,?)",(gid,topic,(old[0]+1 if old else 1),json.dumps(examples),"needs_admin_answer",now()))
     db.commit();db.close()
     return {"session_id":sid,"message":answer,"links":links,"confidence":confidence,"intent":intent,"status":status,"interaction_id":iid}

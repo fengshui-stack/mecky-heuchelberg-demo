@@ -5,13 +5,16 @@ from .store import connect
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["crawl","refresh","reindex","import-rag","stats"])
+    parser.add_argument("command", choices=["crawl","refresh","reindex","import-rag","prune","stats"])
     args = parser.parse_args()
     if args.command in ("crawl","refresh"):
         print(json.dumps(crawl(),ensure_ascii=False,indent=2))
     elif args.command == "import-rag":
         from .manual import import_rag
         print(f"Imported {import_rag()} manually curated sections")
+    elif args.command == "prune":
+        from .retention import prune
+        print(json.dumps(prune(),indent=2))
     elif args.command == "reindex":
         from .crawler import extract_facts
         db=connect()

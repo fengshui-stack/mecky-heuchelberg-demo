@@ -23,6 +23,7 @@ Aktualisierung und Tests:
 .venv/bin/python -m mecky refresh
 .venv/bin/python -m mecky import-rag
 .venv/bin/python -m mecky stats
+.venv/bin/python -m mecky prune
 .venv/bin/python -m pytest -q
 .venv/bin/python scripts/build_eval.py
 .venv/bin/python -m scripts.evaluate
@@ -60,6 +61,6 @@ Team-Wissen lässt sich über `POST /admin/knowledge`, `GET /admin/knowledge`, `
 
 ## Datenschutz und Sicherheit
 
-Die Demo generiert zufällige Session-IDs, speichert keine IP-Adresse und benutzt kein User-Tracking. Gesprächsnachrichten können trotzdem personenbezogene Angaben enthalten; für eine produktive DSGVO-Nutzung sind Löschfristen, Einwilligung und ein persistenter Speicher zu ergänzen. Secrets liegen nur in Umgebungsvariablen, `.env` und Datenbankdateien mit Chats werden nicht committed. Die Admin-API prüft Secrets mit konstantem Vergleich, Eingaben werden validiert und Quellentexte bleiben Daten statt Anweisungen.
+Die Demo generiert zufällige Session-IDs, speichert keine IP-Adresse und benutzt kein User-Tracking. Gesprächskontext wird nach 24 Stunden nicht mehr verwendet; `python -m mecky prune` löscht alte Chats und Sessions nach 7 Tagen sowie Feedback und Interaktionen nach 30 Tagen. Beispiele in Wissenslücken schwärzen E-Mail-Adressen und Telefonnummern. Gesprächsnachrichten können trotzdem personenbezogene Angaben enthalten; für eine produktive DSGVO-Nutzung sind Einwilligung, automatische Löschjobs und ein persistenter Speicher zu ergänzen. Secrets liegen nur in Umgebungsvariablen, `.env` und Datenbankdateien mit Chats werden nicht committed. Die Admin-API prüft Secrets mit konstantem Vergleich, Eingaben werden validiert und Quellentexte bleiben Daten statt Anweisungen.
 
 Der vorherige Chatbot-Prototyp liegt unverändert im Ordner `legacy/`. Seine Inhalte wurden geprüft; für Mecky ist besonders die RAG-Datei im Projektstamm als Team-Wissen relevant.

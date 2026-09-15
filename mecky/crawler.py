@@ -3,6 +3,7 @@ import io
 import logging
 import re
 import xml.etree.ElementTree as ET
+from urllib import robotparser
 from collections import deque
 from urllib.parse import urljoin, urlparse, urldefrag
 
@@ -198,11 +199,17 @@ def crawl():
     seen_count = changed = 0
     errors = []
     with httpx.Client(timeout=22, follow_redirects=True, headers={"User-Agent":"MeckyKnowledgeCrawler/1.0 (+https://heuchelberg.com/)"}) as client:
+        robots=robotparser.RobotFileParser()
+        try:
+            robots.parse(client.get(urljoin(BASE,"robots.txt")).text.splitlines())
+        except Exception as exc:
+            log.warning("robots.txt unavailable: %s",exc)
+            robots.parse(["User-agent: *","Disallow: /wp-admin/"])
         queue = deque([BASE] + sitemap_urls(client))
         seen = set()
         while queue and seen_count < MAX_PAGES:
             url = normalize(queue.popleft())
-            if url in seen or not allowed(url):
+            if url in seen or not allowed(url) or not robots.can_fetch("MeckyKnowledgeCrawler",url):
                 continue
             seen.add(url)
             try:

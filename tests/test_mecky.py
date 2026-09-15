@@ -9,6 +9,8 @@ def test_date_resolution_and_exception(seeded_db):
     ref=datetime(2026,9,15,tzinfo=ZoneInfo("Europe/Berlin"))
     assert resolve_date("morgen",ref).isoformat()=="2026-09-16"
     assert resolve_date("Sonntag",ref).isoformat()=="2026-09-20"
+    assert resolve_date("nächstes Wochenende",ref).isoformat()=="2026-09-19"
+    assert resolve_date("Weihnachten",ref).isoformat()=="2026-12-25"
     answer=chat("hours","Habt ihr am 20.09.2026 offen?")
     assert answer["status"]=="KNOWN"
     assert "11 bis 23" in answer["message"]
