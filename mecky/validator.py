@@ -27,6 +27,14 @@ Ein Faktenfehler ist eine nicht gedeckte Zahl, Uhrzeit, Datum, Menge, ein Gerich
 Kleine sprachliche Umformulierungen sind erlaubt. Ignoriere Smalltalk, Humor, Emotionen, Rückfragen und ehrliche Unsicherheit.
 Bei Unsicherheit entscheide pass. Prüfe nicht Ton oder Stil.
 
+WICHTIGE ENTSCHEIDUNGSREGELN:
+- Eine Frage ist keine Tatsachenbehauptung. Rückfragen immer ignorieren.
+- Gesprächssätze wie „ich hör zu“, „alles gut?“ oder „womit kann ich helfen?“ sind keine Fakten über den Betrieb.
+- Ist der Evidence Cache leer, entscheide pass, solange die Antwort keine konkrete betriebliche Tatsache über die Heuchelberger Warte behauptet.
+- Wenn ein Tool ein ISO-Datum und dazu eine Öffnungszeiten-Regel liefert, ist die Anwendung dieser Regel auf genau dieses Datum gedeckt.
+- Wenn die Antwort dieselben Daten wie der Cache nur natürlicher formuliert, entscheide pass.
+- Erfinde niemals selbst einen möglichen Fehler. Fail nur bei einer konkreten, widersprüchlichen oder fehlenden betrieblichen Behauptung.
+
 ANTWORT:
 """+answer+"\n\nEVIDENCE CACHE:\n"+json.dumps(evidence,ensure_ascii=False)
 

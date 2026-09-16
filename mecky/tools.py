@@ -63,8 +63,8 @@ TOOL_MODELS = {
 }
 
 DESCRIPTIONS = {
-    "get_menu": "Use for hunger, food, menu or dish questions. Read current official dishes, descriptions, prices and dietary labels.",
-    "get_drinks": "Use for thirst or drink questions. Read current official drinks and prices.",
+    "get_menu": "Always call this when a guest expresses hunger or asks about food, a menu or a dish. Read current official dishes, descriptions, prices and dietary labels.",
+    "get_drinks": "Always call this when a guest expresses thirst or asks about drinks. Read current official drinks and prices.",
     "get_opening_hours": "Read official opening hours for one date.",
     "get_dog_policy": "Read the approved rule for dogs.",
     "get_events": "Read confirmed official events in a date range.",
