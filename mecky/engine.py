@@ -126,6 +126,11 @@ def chat(sid,message,*,user_id=None,memory_consent=False,client_context=None):
                 feedback="Deine Antwort war leer oder nicht schema-konform. Formuliere eine kurze Antwort im geforderten Schema."
                 working_input=list(base_input)
                 continue
+            if stable_id(payload["message"].strip()) in state.get("recent_response_hashes",[]):
+                validator_attempts.append({"attempt":generation_index+1,"verdict":"repeat","claims":[],"error":None})
+                feedback="Deine Antwort ist wortgleich mit einer kürzlichen Antwort. Reagiere auf den Gesprächsverlauf und formuliere natürlich anders."
+                payload=None;working_input=list(base_input)
+                continue
             judged=validator_request(payload["message"],evidence,validator_prompt(payload["message"],evidence))
             usage_rows.append(judged["usage"]);verdict=parse_verdict(judged["payload"])
             validator_attempts.append({"attempt":generation_index+1,"verdict":verdict.verdict if verdict else "uncertain",

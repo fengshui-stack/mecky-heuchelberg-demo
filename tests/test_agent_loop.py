@@ -97,3 +97,23 @@ def test_only_last_ten_original_messages_are_sent(seeded_db,monkeypatch):
     monkeypatch.setattr(engine,"agent_request",agent);monkeypatch.setattr(engine,"validator_request",lambda *_a,**_k:pass_result())
     engine.chat("history","neu")
     assert [x["content"] for x in captured["items"]]==[f"original-{n}" for n in range(2,12)]+["neu"]
+
+
+def test_exact_repeat_is_regenerated_before_validation(seeded_db,monkeypatch):
+    repeated="Servus — was kann ich für dich tun?"
+    db=store.connect()
+    db.execute("INSERT INTO sessions VALUES(?,?,?)",("repeat",json.dumps({"turn_count":1,"recent_response_hashes":[store.stable_id(repeated)]}),store.now()))
+    db.execute("INSERT INTO conversation_messages(session_id,role,content,created_at) VALUES(?,?,?,?)",("repeat","user","Hi",store.now()))
+    db.execute("INSERT INTO conversation_messages(session_id,role,content,created_at) VALUES(?,?,?,?)",("repeat","assistant",repeated,store.now()))
+    db.commit();db.close()
+    monkeypatch.setattr(engine,"configured_provider",lambda:"openai")
+    queue=[answer_result(repeated,"smalltalk"),answer_result("Hi nochmal — was liegt an?","smalltalk")]
+    monkeypatch.setattr(engine,"agent_request",lambda *_args,**_kwargs:queue.pop(0))
+    judged=[]
+    def validate(*_args,**_kwargs):judged.append(True);return pass_result()
+    monkeypatch.setattr(engine,"validator_request",validate)
+    result=engine.chat("repeat","Hi")
+    assert result["message"]=="Hi nochmal — was liegt an?" and result["retry_count"]==1
+    assert len(judged)==1
+    db=store.connect();detail=json.loads(db.execute("SELECT detail FROM decision_events WHERE stage='validator'").fetchone()[0]);db.close()
+    assert [x["verdict"] for x in detail["attempts"]]==["repeat","pass"]
