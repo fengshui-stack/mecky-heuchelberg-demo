@@ -1,0 +1,6 @@
+{
+  "llm": {"provider": "openai", "model": "gpt-5-mini", "temperature": 0.7, "max_tokens": 400, "timeout_seconds": 15, "retries": 2},
+  "tools": {"strict_schemas": true, "parallel_tool_calls": true, "max_tools_per_request": 20, "max_tool_rounds": 3},
+  "validator": {"enabled": true, "llm_judge_model": "gpt-5-mini", "max_retries": 2, "pass_on_uncertainty": true},
+  "streaming": {"enabled": true, "transport": "sse"}
+}

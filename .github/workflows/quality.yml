@@ -1,0 +1,40 @@
+name: Mecky quality
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_llm_evals:
+        description: Run billable Ragas/DeepEval checks
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e '.[test]'
+      - run: python -m pytest -q
+      - run: python -m compileall -q mecky
+
+  llm-judge:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_llm_evals
+    needs: deterministic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e '.[test]'
+      - run: python scripts/live_engine_check.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LLM_PROVIDER: openai
+          LLM_MODEL: gpt-5-mini

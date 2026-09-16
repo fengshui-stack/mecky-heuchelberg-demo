@@ -13,7 +13,11 @@ services:
       - key: MECKY_DB
         value: /tmp/mecky.db
       - key: LLM_PROVIDER
-        value: mock
+        value: openai
+      - key: LLM_MODEL
+        value: gpt-5-mini
+      - key: OPENAI_API_KEY
+        sync: false
       - key: MECKY_ALLOWED_ORIGINS
         value: https://mecky-kundentest.ben-fenger.chatgpt.site
       - key: ADMIN_SECRET

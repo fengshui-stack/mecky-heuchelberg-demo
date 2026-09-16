@@ -1,0 +1,515 @@
+{
+  "run": {
+    "date": "2026-09-16",
+    "url": "https://mecky-kundentest.ben-fenger.chatgpt.site/",
+    "build": "pre-model-led baseline",
+    "messages": 100,
+    "provider": "rules",
+    "model": null,
+    "model_calls": 0,
+    "tokens_total": 0,
+    "cost_usd": 0
+  },
+  "transcript": [
+    {
+      "number": 1,
+      "user": "Hallo Mecky, ich plane zum ersten Mal einen Besuch. Was gibt es bei euch?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 2,
+      "user": "Hi",
+      "mecky": "Servus! Schön, dass du da bist. Ich bin Mecky, dein digitaler Gastgeber. Wie kann ich dir bei eurem Besuch auf dem Heuchelberg helfen?"
+    },
+    {
+      "number": 3,
+      "user": "Wie geht's dir?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 4,
+      "user": "ich hab hunger",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 5,
+      "user": "ich hab hungerrr",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 6,
+      "user": "gibts was zu futtern?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 7,
+      "user": "Was habt ihr Leckeres?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 8,
+      "user": "Eher was Herzhaftes bitte.",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 9,
+      "user": "Habt ihr Schnitzel?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 10,
+      "user": "Wie teuer?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 11,
+      "user": "Und vegetarisch?",
+      "mecky": "Die aktuelle Karte kannst du direkt ansehen. Für einzelne Gerichte oder Allergene prüf bitte die Karte oder frag das Team, falls du eine sichere Auskunft brauchst."
+    },
+    {
+      "number": 12,
+      "user": "Habt ihr veganes Essen?",
+      "mecky": "Die aktuelle Karte kannst du direkt ansehen. Für einzelne Gerichte oder Allergene prüf bitte die Karte oder frag das Team, falls du eine sichere Auskunft brauchst."
+    },
+    {
+      "number": 13,
+      "user": "Gibt es glutenfreie Optionen?",
+      "mecky": "Ja, laut den Team-Informationen gibt es glutenfreie Gerichte auf der Karte. Für Allergien oder besondere Anforderungen frag bitte sicherheitshalber direkt beim Team nach."
+    },
+    {
+      "number": 14,
+      "user": "Wo finde ich Hinweise zu Allergenen?",
+      "mecky": "Die aktuelle Karte kannst du direkt ansehen. Für einzelne Gerichte oder Allergene prüf bitte die Karte oder frag das Team, falls du eine sichere Auskunft brauchst."
+    },
+    {
+      "number": 15,
+      "user": "Gibt es Kindergerichte?",
+      "mecky": "Die aktuelle Karte kannst du direkt ansehen. Für einzelne Gerichte oder Allergene prüf bitte die Karte oder frag das Team, falls du eine sichere Auskunft brauchst."
+    },
+    {
+      "number": 16,
+      "user": "Zeig mir bitte die Speisekarte.",
+      "mecky": "Die aktuelle Karte kannst du direkt ansehen. Für einzelne Gerichte oder Allergene prüf bitte die Karte oder frag das Team, falls du eine sichere Auskunft brauchst."
+    },
+    {
+      "number": 17,
+      "user": "Wo finde ich die Mittagstischkarte?",
+      "mecky": "Die aktuelle Karte kannst du direkt ansehen. Für einzelne Gerichte oder Allergene prüf bitte die Karte oder frag das Team, falls du eine sichere Auskunft brauchst."
+    },
+    {
+      "number": 18,
+      "user": "Habt ihr Kuchen?",
+      "mecky": "Einige Tische können nach dem Essen für Kaffee und Kuchen sitzen bleiben, je nach Personenzahl und Verfügbarkeit."
+    },
+    {
+      "number": 19,
+      "user": "Gibt's Kaffee und Waffeln?",
+      "mecky": "Zu Getränke gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 20,
+      "user": "Was kostet der Burger genau?",
+      "mecky": "Die aktuelle Karte kannst du direkt ansehen. Für einzelne Gerichte oder Allergene prüf bitte die Karte oder frag das Team, falls du eine sichere Auskunft brauchst."
+    },
+    {
+      "number": 21,
+      "user": "ich hab durst",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 22,
+      "user": "was gibts bei euch zu saufen?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 23,
+      "user": "Habt ihr Bier?",
+      "mecky": "Zu Getränke gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 24,
+      "user": "Welches Bier denn?",
+      "mecky": "Zu Getränke gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 25,
+      "user": "Und Wein?",
+      "mecky": "Zu Getränke gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 26,
+      "user": "Gibt es alkoholfreie Getränke?",
+      "mecky": "Zu Getränke gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 27,
+      "user": "Zeig mir die Getränkekarte.",
+      "mecky": "Die Getränkekarte kannst du hier direkt ansehen."
+    },
+    {
+      "number": 28,
+      "user": "hamma morgen auf?",
+      "mecky": "Zu Getränke gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 29,
+      "user": "Habt ihr heute offen?",
+      "mecky": "Am Mittwoch, 16.09.2026, sind wir von 12 bis 22 Uhr für euch da."
+    },
+    {
+      "number": 30,
+      "user": "Wie lange habt ihr Sonntag geöffnet?",
+      "mecky": "Am Sonntag, 20.09.2026, sind wir von 11 bis 23 Uhr für euch da."
+    },
+    {
+      "number": 31,
+      "user": "Wie sind die Öffnungszeiten im Oktober?",
+      "mecky": "Am Sonntag, 20.09.2026, sind wir von 11 bis 23 Uhr für euch da."
+    },
+    {
+      "number": 32,
+      "user": "Kann ich Montag einfach vorbeikommen?",
+      "mecky": "Für Montag, 21.09.2026, gilt bei uns: Mo & Di nur für Veranstaltungen & Events auf Vorbestellung geöffnet."
+    },
+    {
+      "number": 33,
+      "user": "Bis wann hat die Küche heute offen?",
+      "mecky": "Am 16.09.2026 hat die Küche laut Website bis 21 Uhr, ab 25 °C bis 21:30 Uhr geöffnet. Bei kaltem oder schlechtem Wetter kann sie früher schließen."
+    },
+    {
+      "number": 34,
+      "user": "Habt ihr morgen Abend Küche?",
+      "mecky": "Am Donnerstag, 17.09.2026, sind wir von 12 bis 22 Uhr für euch da."
+    },
+    {
+      "number": 35,
+      "user": "Gibt es um 22 Uhr noch warme Gerichte?",
+      "mecky": "Die aktuelle Karte kannst du direkt ansehen. Für einzelne Gerichte oder Allergene prüf bitte die Karte oder frag das Team, falls du eine sichere Auskunft brauchst."
+    },
+    {
+      "number": 36,
+      "user": "Schließt die Küche bei Regen früher?",
+      "mecky": "Am Donnerstag, 17.09.2026, sind wir von 12 bis 22 Uhr für euch da."
+    },
+    {
+      "number": 37,
+      "user": "Kann ich spontan Samstag kommen?",
+      "mecky": "Einen Tisch könnt ihr online für 1 bis 14 Gäste reservieren. Freie Zeiten seht ihr direkt im Buchungssystem."
+    },
+    {
+      "number": 38,
+      "user": "Wir sind acht. Können wir reservieren?",
+      "mecky": "Einen Tisch könnt ihr online für 1 bis 14 Gäste reservieren. Freie Zeiten seht ihr direkt im Buchungssystem."
+    },
+    {
+      "number": 39,
+      "user": "Und Sonntag?",
+      "mecky": "Einen Tisch könnt ihr online für 1 bis 14 Gäste reservieren. Freie Zeiten seht ihr direkt im Buchungssystem."
+    },
+    {
+      "number": 40,
+      "user": "Sind morgen noch Plätze frei?",
+      "mecky": "Für verfügbare Zeiten und Buchungen nutze bitte das Online-Reservierungssystem."
+    },
+    {
+      "number": 41,
+      "user": "Kann ich einen bestimmten Tisch buchen?",
+      "mecky": "Einen bestimmten Tisch könnt ihr leider nicht fest reservieren. Das Team vergibt die Plätze passend zur Personenzahl und Verfügbarkeit."
+    },
+    {
+      "number": 42,
+      "user": "Wie weit im Voraus kann ich reservieren?",
+      "mecky": "Tischreservierungen im Bedienbereich sind laut aktueller Website 28 Tage im Voraus möglich. Freie Zeiten seht ihr direkt im Buchungssystem."
+    },
+    {
+      "number": 43,
+      "user": "Wir sind 20 Personen – geht das online?",
+      "mecky": "Für 20 Personen könnt ihr einen Besuch planen. Ob zu eurem Wunschtermin noch Platz ist, zeigt das Buchungssystem."
+    },
+    {
+      "number": 44,
+      "user": "Wie storniere ich meinen Tisch?",
+      "mecky": "Für 20 Personen klärt ihr die Reservierung am besten direkt mit dem Team; die Online-Tischreservierung ist für 1 bis 14 Gäste vorgesehen."
+    },
+    {
+      "number": 45,
+      "user": "Brauche ich für den Biergarten eine Reservierung?",
+      "mecky": "Im Biergarten findet ihr häufig auch ohne Reservierung ein Plätzchen. Für größere Gruppen fragt bitte vorher an, damit das Team die Möglichkeiten prüfen kann."
+    },
+    {
+      "number": 46,
+      "user": "Darf mein Hund mit?",
+      "mecky": "Na klar, euer Hund ist bei uns willkommen! Bitte nehmt ihn an die Leine, damit sich alle Gäste wohlfühlen."
+    },
+    {
+      "number": 47,
+      "user": "Muss der Hund an die Leine?",
+      "mecky": "Na klar, euer Hund ist bei uns willkommen! Bitte nehmt ihn an die Leine, damit sich alle Gäste wohlfühlen."
+    },
+    {
+      "number": 48,
+      "user": "Sind Hunde draußen erlaubt?",
+      "mecky": "Na klar, euer Hund ist bei uns willkommen! Bitte nehmt ihn an die Leine, damit sich alle Gäste wohlfühlen."
+    },
+    {
+      "number": 49,
+      "user": "Wo kann ich parken?",
+      "mecky": "Bitte fahrt nicht direkt bis zur Warte hoch. Der Hauptparkplatz liegt unten am Fuß des Bergs; von dort sind es etwa 10 Minuten zu Fuß bergauf oder ihr nutzt den Heuchelberg-Hupfer."
+    },
+    {
+      "number": 50,
+      "user": "Darf ich direkt hochfahren?",
+      "mecky": "Bitte fahrt nicht direkt bis zur Warte hoch. Der Hauptparkplatz liegt unten am Fuß des Bergs; von dort sind es etwa 10 Minuten zu Fuß bergauf oder ihr nutzt den Heuchelberg-Hupfer."
+    },
+    {
+      "number": 51,
+      "user": "Wie weit ist es vom Hauptparkplatz?",
+      "mecky": "Bitte fahrt nicht direkt bis zur Warte hoch. Der Hauptparkplatz liegt unten am Fuß des Bergs; von dort sind es etwa 10 Minuten zu Fuß bergauf oder ihr nutzt den Heuchelberg-Hupfer."
+    },
+    {
+      "number": 52,
+      "user": "Gibt es einen E-Ladeplatz?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 53,
+      "user": "Wo ist die Hupferhaltestelle?",
+      "mecky": "Der Heuchelberg-Hupfer fährt vom Hauptparkplatz bis zum Wirtshaus. Laut Website kosten Einzelfahrten bergauf 1 €; die Talfahrt ist kostenlos."
+    },
+    {
+      "number": 54,
+      "user": "Was kostet der Shuttle?",
+      "mecky": "Der Heuchelberg-Hupfer fährt vom Hauptparkplatz bis zum Wirtshaus. Laut Website kosten Einzelfahrten bergauf 1 €; die Talfahrt ist kostenlos."
+    },
+    {
+      "number": 55,
+      "user": "Wie lange dauert die Shuttlefahrt?",
+      "mecky": "Der Heuchelberg-Hupfer fährt vom Hauptparkplatz bis zum Wirtshaus. Laut Website kosten Einzelfahrten bergauf 1 €; die Talfahrt ist kostenlos."
+    },
+    {
+      "number": 56,
+      "user": "Wie komme ich mit der S-Bahn?",
+      "mecky": "Mit der S-Bahn S4 kommt ihr nach Leingarten. Von Leingarten Mitte oder Leingarten Bahnhof dauert der Fußweg zur Warte laut Website etwa 45 Minuten."
+    },
+    {
+      "number": 57,
+      "user": "Wie lange laufe ich vom Bahnhof?",
+      "mecky": "Mit der S-Bahn S4 kommt ihr nach Leingarten. Von Leingarten Mitte oder Leingarten Bahnhof dauert der Fußweg zur Warte laut Website etwa 45 Minuten."
+    },
+    {
+      "number": 58,
+      "user": "Wie lautet eure Adresse?",
+      "mecky": "Ihr findet uns auf dem Heuchelberg 1, 74211 Leingarten-Heilbronn. Für die Anfahrt nutzt bitte einen der Parkplätze unten am Berg."
+    },
+    {
+      "number": 59,
+      "user": "Kann ich mit einem Reisebus direkt hoch?",
+      "mecky": "Mit der S-Bahn S4 kommt ihr nach Leingarten. Von Leingarten Mitte oder Leingarten Bahnhof dauert der Fußweg zur Warte laut Website etwa 45 Minuten."
+    },
+    {
+      "number": 60,
+      "user": "Ist der Weg rollstuhlgerecht?",
+      "mecky": "Wer schlecht zu Fuß ist, kann vom Hauptparkplatz den Heuchelberg-Hupfer nach oben nehmen. Der Weg vom Wanderparkplatz „Alte Burg“ ist laut Website flach und auch für Rollstuhlfahrer geeignet."
+    },
+    {
+      "number": 61,
+      "user": "Gibt es ein barrierefreies WC?",
+      "mecky": "Wer schlecht zu Fuß ist, kann vom Hauptparkplatz den Heuchelberg-Hupfer nach oben nehmen. Der Weg vom Wanderparkplatz „Alte Burg“ ist laut Website flach und auch für Rollstuhlfahrer geeignet."
+    },
+    {
+      "number": 62,
+      "user": "Kann ich mit Kinderwagen hoch?",
+      "mecky": "Wer schlecht zu Fuß ist, kann vom Hauptparkplatz den Heuchelberg-Hupfer nach oben nehmen. Der Weg vom Wanderparkplatz „Alte Burg“ ist laut Website flach und auch für Rollstuhlfahrer geeignet."
+    },
+    {
+      "number": 63,
+      "user": "Gibt es Behindertenparkplätze?",
+      "mecky": "Bitte fahrt nicht direkt bis zur Warte hoch. Der Hauptparkplatz liegt unten am Fuß des Bergs; von dort sind es etwa 10 Minuten zu Fuß bergauf oder ihr nutzt den Heuchelberg-Hupfer."
+    },
+    {
+      "number": 64,
+      "user": "Was kann ich mit Kindern machen?",
+      "mecky": "Zu Angebote für Kinder gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 65,
+      "user": "Gibt es Ponyreiten?",
+      "mecky": "Zu Angebote für Kinder gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 66,
+      "user": "Gibt es Sonntag Ponyreiten um 10?",
+      "mecky": "Für den 20.09.2026 nennt die aktuelle Website Ponyreiten von 13 bis 17 Uhr."
+    },
+    {
+      "number": 67,
+      "user": "Gibt es einen Spielplatz?",
+      "mecky": "Zu Angebote für Kinder gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 68,
+      "user": "Kann ich Kindergeburtstag feiern?",
+      "mecky": "Schön, dass ihr an uns denkt! Kindergeburtstage sind bei uns leider nicht möglich."
+    },
+    {
+      "number": 69,
+      "user": "Brauche ich Tickets fürs Ponyreiten?",
+      "mecky": "Zu Angebote für Kinder gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 70,
+      "user": "Kann ich draußen sitzen?",
+      "mecky": "Ja, im Garten könnt ihr zu den Öffnungszeiten draußen sitzen, auch bei wechselhaftem Wetter. Dort ist Selbstbedienung; einen Platz sucht ihr euch selbst."
+    },
+    {
+      "number": 71,
+      "user": "Ist der Garten bei Regen offen?",
+      "mecky": "Ja, im Garten könnt ihr zu den Öffnungszeiten draußen sitzen, auch bei wechselhaftem Wetter. Dort ist Selbstbedienung; einen Platz sucht ihr euch selbst."
+    },
+    {
+      "number": 72,
+      "user": "Muss ich mich im Biergarten selbst bedienen?",
+      "mecky": "Ja, im Garten könnt ihr zu den Öffnungszeiten draußen sitzen, auch bei wechselhaftem Wetter. Dort ist Selbstbedienung; einen Platz sucht ihr euch selbst."
+    },
+    {
+      "number": 73,
+      "user": "Gibt es draußen die gleiche Karte?",
+      "mecky": "Ja, im Garten könnt ihr zu den Öffnungszeiten draußen sitzen, auch bei wechselhaftem Wetter. Dort ist Selbstbedienung; einen Platz sucht ihr euch selbst."
+    },
+    {
+      "number": 74,
+      "user": "Ist die Terrasse im Oktober offen?",
+      "mecky": "Am Sonntag, 20.09.2026, sind wir von 11 bis 23 Uhr für euch da."
+    },
+    {
+      "number": 75,
+      "user": "Kann man bei euch heiraten?",
+      "mecky": "Ja, Hochzeiten können bei uns stattfinden. Für eure Vorstellungen und einen passenden Termin hilft euch das Team gern weiter."
+    },
+    {
+      "number": 76,
+      "user": "Was kostet eine Hochzeit?",
+      "mecky": "Zu Hochzeiten gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 77,
+      "user": "Wie viele Hochzeitsgäste passen hinein?",
+      "mecky": "Zu Hochzeiten gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 78,
+      "user": "Gibt es Hochzeitsinfoabende?",
+      "mecky": "Ja, Hochzeiten können bei uns stattfinden. Für eure Vorstellungen und einen passenden Termin hilft euch das Team gern weiter."
+    },
+    {
+      "number": 79,
+      "user": "Wie frage ich ein Hochzeitsangebot an?",
+      "mecky": "Das Team hilft euch gern weiter! Ihr erreicht uns per E-Mail an info@heuchelberg.com oder telefonisch unter 07131 401849."
+    },
+    {
+      "number": 80,
+      "user": "Wir planen eine Firmenfeier.",
+      "mecky": "Ja, Firmenfeiern können bei uns stattfinden. Für eure Vorstellungen und einen passenden Termin hilft euch das Team gern weiter."
+    },
+    {
+      "number": 81,
+      "user": "Kann man mit 100 Kollegen feiern?",
+      "mecky": "Ja, Firmenfeiern können bei uns stattfinden. Für eure Vorstellungen und einen passenden Termin hilft euch das Team gern weiter."
+    },
+    {
+      "number": 82,
+      "user": "Gibt es Weihnachtsfeiern?",
+      "mecky": "Ja, Firmenfeiern können bei uns stattfinden. Für eure Vorstellungen und einen passenden Termin hilft euch das Team gern weiter."
+    },
+    {
+      "number": 83,
+      "user": "Was kostet ein Teamabend?",
+      "mecky": "Zu Firmenfeiern gibt es Informationen auf der offiziellen Seite. Einen konkreten Termin, Preis oder freie Plätze kann ich gerade nicht bestätigen; frag dafür bitte direkt beim Team nach."
+    },
+    {
+      "number": 84,
+      "user": "Welche Räume eignen sich für Firmen?",
+      "mecky": "Ja, Firmenfeiern können bei uns stattfinden. Für eure Vorstellungen und einen passenden Termin hilft euch das Team gern weiter."
+    },
+    {
+      "number": 85,
+      "user": "Was ist morgen für ein Event?",
+      "mecky": "Für den 17.09.2026 kann ich gerade keinen konkreten Event bestätigen. Die aktuellen Termine findest du auf der Eventseite."
+    },
+    {
+      "number": 86,
+      "user": "Gibt es eine geheime Weinprobe für 5 Euro?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 87,
+      "user": "Wie lautet eure E-Mail?",
+      "mecky": "Das Team hilft euch gern weiter! Ihr erreicht uns per E-Mail an info@heuchelberg.com oder telefonisch unter 07131 401849."
+    },
+    {
+      "number": 88,
+      "user": "Habt ihr eine Telefonnummer?",
+      "mecky": "Das Team hilft euch gern weiter! Ihr erreicht uns per E-Mail an info@heuchelberg.com oder telefonisch unter 07131 401849."
+    },
+    {
+      "number": 89,
+      "user": "Kann ich per WhatsApp schreiben?",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 90,
+      "user": "Kann ich mit Kreditkarte zahlen?",
+      "mecky": "Ihr könnt bar oder mit EC-Karte zahlen. Bei Kreditkarten sind Visa und Mastercard möglich."
+    },
+    {
+      "number": 91,
+      "user": "Darf ich rauchen?",
+      "mecky": "Rauchen ist nur im Biergarten erlaubt."
+    },
+    {
+      "number": 92,
+      "user": "Gibt es Übernachtung vor Ort?",
+      "mecky": "Eine Übernachtung direkt bei uns gibt es nicht."
+    },
+    {
+      "number": 93,
+      "user": "Kann man frühstücken?",
+      "mecky": "Einen regulären Frühstücksbetrieb gibt es nicht. Einen Berg-Brunch könnt ihr auf Vorbestellung buchen; die Details stehen auf der offiziellen Seite."
+    },
+    {
+      "number": 94,
+      "user": "Gibt es Berg-Brunch?",
+      "mecky": "Einen regulären Frühstücksbetrieb gibt es nicht. Einen Berg-Brunch könnt ihr auf Vorbestellung buchen; die Details stehen auf der offiziellen Seite."
+    },
+    {
+      "number": 95,
+      "user": "Was hältst du von der AfD?",
+      "mecky": "Bei politischen Themen halte ich mich freundlich raus. Ich bin Mecky, dein digitaler Gastgeber für die Heuchelberger Warte. Wenn du etwas zu eurem Besuch, Essen oder Feiern wissen möchtest, helfe ich dir gern."
+    },
+    {
+      "number": 96,
+      "user": "Welche Partei soll ich wählen?",
+      "mecky": "Bei politischen Themen halte ich mich freundlich raus. Ich bin Mecky, dein digitaler Gastgeber für die Heuchelberger Warte. Wenn du etwas zu eurem Besuch, Essen oder Feiern wissen möchtest, helfe ich dir gern."
+    },
+    {
+      "number": 97,
+      "user": "Erklär mir Quantenphysik.",
+      "mecky": "Dabei kann ich dir hier leider nicht helfen. Ich bin für Fragen rund um die Heuchelberger Warte da – zum Beispiel zu eurem Besuch, zur Speisekarte oder zur Reservierung. Was möchtest du dazu wissen?"
+    },
+    {
+      "number": 98,
+      "user": "Schreib mir Python-Code.",
+      "mecky": "Dabei kann ich dir hier leider nicht helfen. Ich bin für Fragen rund um die Heuchelberger Warte da – zum Beispiel zu eurem Besuch, zur Speisekarte oder zur Reservierung. Was möchtest du dazu wissen?"
+    },
+    {
+      "number": 99,
+      "user": "du bist dumm",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    },
+    {
+      "number": 100,
+      "user": "Danke, war nett",
+      "mecky": "Da möchte ich dir nichts Falsches erzählen – dazu habe ich gerade keine verlässliche Info. Ich helfe dir gern rund um die Heuchelberger Warte; für offene Fragen zu eurem Besuch ist auch unser Team für dich da."
+    }
+  ]
+}

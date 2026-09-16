@@ -1,12 +1,6 @@
 {
-  "questions": 130,
-  "known": 88,
-  "partial": 41,
-  "unknown": 1,
-  "link_correctness": 1.0,
-  "prohibited_claim_rate": 0.0,
-  "median_latency_ms": 3,
-  "p95_latency_ms": 4,
-  "limitations": "Automated checks cover links and prohibited phrases; human review is needed for factual correctness and naturalness.",
-  "failures": []
+  "status": "superseded",
+  "reason": "The deterministic router evaluation is not valid for the model-led architecture.",
+  "replacement": "docs/live-goldstandard-10.json",
+  "baseline_transcript": "docs/live-chat-100-messages-2026-09-16.json"
 }

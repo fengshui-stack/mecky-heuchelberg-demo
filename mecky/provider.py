@@ -1,99 +1,109 @@
+"""OpenAI Responses API transport for the model-led agent and its validator."""
 import json
 import math
 import os
-from pathlib import Path
 
 import httpx
 
-PROMPT_PARTS = ("identity", "conversation", "grounding", "safety", "reservations", "style")
-PROMPT = "\n\n".join(Path("prompts", name + ".md").read_text(encoding="utf-8") for name in PROMPT_PARTS)
+from .config import load_config
+from .validator import schema as validator_schema
+
+
+ANSWER_SCHEMA={
+    "type":"object","additionalProperties":False,
+    "properties":{
+        "message":{"type":"string","minLength":1,"maxLength":1000},
+        "response_type":{"type":"string","enum":["factual","smalltalk","clarification","casual","abuse","fallback"]},
+        "contact_needed":{"type":"boolean"}
+    },
+    "required":["message","response_type","contact_needed"]
+}
 
 
 def configured_provider():
-    name = os.getenv("LLM_PROVIDER", "mock").lower()
-    if name == "openai" and os.getenv("OPENAI_API_KEY"):
-        return "openai"
-    if name == "openrouter" and os.getenv("OPENROUTER_API_KEY"):
-        return "openrouter"
-    return "mock"
+    return "openai" if os.getenv("LLM_PROVIDER",load_config().llm.provider).lower()=="openai" and os.getenv("OPENAI_API_KEY") else "mock"
 
 
 def nonnegative_number(value):
-    if isinstance(value, bool) or value is None or value == "":
-        return None
+    if isinstance(value,bool) or value is None or value=="":return None
     try:
-        number = float(value)
-        return number if math.isfinite(number) and number >= 0 else None
-    except (TypeError, ValueError):
-        return None
+        number=float(value);return number if math.isfinite(number) and number>=0 else None
+    except (TypeError,ValueError):return None
 
 
 def model_configuration():
-    provider = configured_provider()
-    model = None if provider == "mock" else os.getenv("LLM_MODEL") or ("gpt-5-mini" if provider == "openai" else "openrouter/free")
-    return {
-        "provider": provider, "model": model, "scope": "guest_tone_and_smalltalk", "currency": "USD",
-        "input_usd_per_m": nonnegative_number(os.getenv("LLM_INPUT_USD_PER_M") or ("0.25" if provider == "openai" and model == "gpt-5-mini" else "")),
-        "output_usd_per_m": nonnegative_number(os.getenv("LLM_OUTPUT_USD_PER_M") or ("2" if provider == "openai" and model == "gpt-5-mini" else "")),
-    }
+    cfg=load_config();provider=configured_provider();model=cfg.llm.model if provider=="openai" else None
+    return {"provider":provider,"model":model,"validator_model":cfg.validator.llm_judge_model if provider=="openai" else None,
+            "scope":"agent_and_evidence_validator","currency":"USD","api":"responses" if provider=="openai" else None,
+            "input_usd_per_m":nonnegative_number(os.getenv("LLM_INPUT_USD_PER_M") or ("0.25" if model=="gpt-5-mini" else "")),
+            "output_usd_per_m":nonnegative_number(os.getenv("LLM_OUTPUT_USD_PER_M") or ("2" if model=="gpt-5-mini" else ""))}
 
 
 def no_model_usage():
-    return {"provider": "rules", "model": None, "model_called": False, "tokens_input": 0,
-            "tokens_output": 0, "tokens_total": 0, "cost_usd": 0.0, "currency": "USD",
-            "cost_status": "not_used", "tokens_complete": True}
+    return {"provider":"rules","model":None,"model_called":False,"model_calls":0,"tokens_input":0,"tokens_output":0,
+            "tokens_total":0,"tokens_complete":True,"cost_usd":0.0,"currency":"USD","cost_status":"not_used"}
 
 
-def measured_usage(data, config):
-    raw = data.get("usage") or {}
-    def count(key):
-        value = raw.get(key)
-        return value if type(value) is int and value >= 0 else None
-    tin, tout = count("prompt_tokens"), count("completion_tokens")
-    complete = tin is not None and tout is not None
-    # OpenRouter reports billed credits. Direct-provider costs are estimates
-    # from configured rates; missing rates never mean a request was free.
-    reported = nonnegative_number(raw.get("cost")) if config["provider"] == "openrouter" else None
-    cost, source = reported, "reported" if reported is not None else "unpriced"
-    if reported is None and complete and config["input_usd_per_m"] is not None and config["output_usd_per_m"] is not None:
-        cost = (tin * config["input_usd_per_m"] + tout * config["output_usd_per_m"]) / 1_000_000
-        source = "estimated"
-    elif reported is None and not complete:
-        source = "unavailable"
-    return {"provider": config["provider"], "model": data.get("model") or config["model"],
-            "model_called": True, "tokens_input": tin, "tokens_output": tout,
-            "tokens_total": tin + tout if complete else None, "tokens_complete": complete,
-            "cost_usd": cost, "currency": "USD", "cost_status": source}
+def measured_usage(data,model):
+    raw=data.get("usage") or {};tin=raw.get("input_tokens");tout=raw.get("output_tokens")
+    complete=type(tin) is int and type(tout) is int
+    config=model_configuration();ip=config["input_usd_per_m"];op=config["output_usd_per_m"]
+    cost=(tin*ip+tout*op)/1_000_000 if complete and ip is not None and op is not None else None
+    return {"provider":"openai","model":data.get("model") or model,"model_called":True,"model_calls":1,
+            "tokens_input":tin,"tokens_output":tout,"tokens_total":tin+tout if complete else None,
+            "tokens_complete":complete,"cost_usd":cost,"currency":"USD","cost_status":"estimated" if cost is not None else "unavailable"}
 
 
-def generate(question, context, sources, status, verified_answer=None, recent_turns=None):
-    config = model_configuration()
-    if config["provider"] == "mock" or status == "UNKNOWN":
-        return {"message": None, "usage": no_model_usage()}
-    if config["provider"] == "openai":
-        endpoint, key = "https://api.openai.com/v1/chat/completions", os.environ["OPENAI_API_KEY"]
-    else:
-        endpoint, key = "https://openrouter.ai/api/v1/chat/completions", os.environ["OPENROUTER_API_KEY"]
-    facts = [{"url": x["url"], "title": x["title"], "content": x["snippet"][:1000]} for x in sources[:3]]
-    payload = {"model": config["model"], "max_completion_tokens": 350, "messages": [
-        {"role": "system", "content": PROMPT},
-        {"role": "user", "content": json.dumps({"question": question, "session_context": context,
-            "source_status": status, "recent_turns": (recent_turns or [])[-6:],
-            "verified_answer": verified_answer,
-            "task": "Write only one short, warm acknowledgement of the guest's specific situation or question. No venue facts, dates, prices, availability or promises. The verified answer is appended unchanged by the application." if verified_answer else "Reply warmly to smalltalk without venue facts.",
-            "untrusted_official_source_data": facts}, ensure_ascii=False)}]}
-    if config["provider"] == "openai" and config["model"] == "gpt-5-mini":
-        payload["reasoning_effort"] = "minimal"
-    if config["provider"] == "openrouter":
-        payload["max_tokens"] = payload.pop("max_completion_tokens")
-    usage = measured_usage({}, config)
+def _text(data):
+    if isinstance(data.get("output_text"),str):return data["output_text"]
+    for item in data.get("output",[]):
+        if item.get("type")=="message":
+            for content in item.get("content",[]):
+                if content.get("type") in ("output_text","text") and content.get("text"):return content["text"]
+    return None
+
+
+def _post(request:dict,model:str)->dict:
+    usage={**no_model_usage(),"provider":"openai","model":model,"model_called":True,"model_calls":1,
+           "tokens_input":None,"tokens_output":None,"tokens_total":None,"tokens_complete":False,"cost_usd":None,"cost_status":"unavailable"}
+    if configured_provider()!="openai":return {"data":None,"usage":no_model_usage(),"error":"MODEL_NOT_CONFIGURED"}
     try:
-        response = httpx.post(endpoint, json=payload, headers={"Authorization": "Bearer " + key}, timeout=12)
-        response.raise_for_status()
-        data = response.json()
-        # Billable tokens still count if the returned answer is unusable.
-        usage = measured_usage(data, config)
-        message = data["choices"][0]["message"]["content"].strip()
-        return {"message": message if 0 < len(message) < 1200 else None, "usage": usage}
-    except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError, AttributeError):
-        return {"message": None, "usage": usage}
+        response=httpx.post("https://api.openai.com/v1/responses",json=request,
+                            headers={"Authorization":"Bearer "+os.environ["OPENAI_API_KEY"],"Content-Type":"application/json"},
+                            timeout=load_config().llm.timeout_seconds)
+        response.raise_for_status();data=response.json()
+        return {"data":data,"usage":measured_usage(data,model),"error":None}
+    except (httpx.HTTPError,ValueError,KeyError,TypeError) as exc:
+        return {"data":None,"usage":usage,"error":type(exc).__name__}
+
+
+def agent_request(input_items:list,system_prompt:str,tools:list,feedback:str|None=None)->dict:
+    cfg=load_config();instructions=system_prompt+("\n\nKORREKTURHINWEIS DES FAKTENPRÜFERS:\n"+feedback if feedback else "")
+    request={"model":cfg.llm.model,"instructions":instructions,"input":input_items,"tools":tools[:cfg.tools.max_tools_per_request],
+             "parallel_tool_calls":cfg.tools.parallel_tool_calls,
+             "max_output_tokens":cfg.llm.max_tokens,"store":False,"reasoning":{"effort":"minimal"},
+             "text":{"format":{"type":"json_schema","name":"mecky_answer","strict":True,"schema":ANSWER_SCHEMA}}}
+    result=_post(request,cfg.llm.model);data=result["data"] or {};calls=[]
+    for item in data.get("output",[]):
+        if item.get("type")=="function_call":
+            try:arguments=json.loads(item.get("arguments") or "{}")
+            except json.JSONDecodeError:arguments={"__invalid_json__":True}
+            calls.append({"call_id":item.get("call_id"),"name":item.get("name"),"arguments":arguments,"raw":item})
+    payload=None;text=_text(data)
+    if text:
+        try:payload=json.loads(text)
+        except json.JSONDecodeError:payload=None
+    return {"payload":payload,"tool_calls":calls,"output_items":data.get("output",[]),"usage":result["usage"],"error":result["error"]}
+
+
+def validator_request(answer:str,evidence:dict,validator_prompt:str)->dict:
+    cfg=load_config();model=cfg.validator.llm_judge_model
+    request={"model":model,"instructions":"Prüfe nur Faktenbindung. Antworte ausschließlich im JSON-Schema.",
+             "input":[{"role":"user","content":[{"type":"input_text","text":validator_prompt}]}],
+             "max_output_tokens":250,"store":False,"reasoning":{"effort":"minimal"},
+             "text":{"format":{"type":"json_schema","name":"mecky_verdict","strict":True,"schema":validator_schema()}}}
+    result=_post(request,model);text=_text(result["data"] or {});payload=None
+    if text:
+        try:payload=json.loads(text)
+        except json.JSONDecodeError:payload=None
+    return {"payload":payload,"usage":result["usage"],"error":result["error"]}

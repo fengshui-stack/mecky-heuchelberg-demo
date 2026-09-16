@@ -34,12 +34,14 @@ async function send(text){
   text=text.trim();if(!text||busy)return;busy=true;input.value='';suggestions.hidden=true;bubble('user',text);
   input.disabled=true;form.querySelector('button').disabled=true;const pending=typing();const started=performance.now();
   try{
-    const r=await fetch('/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:sid,message:text})});
-    if(!r.ok)throw new Error('Die Anfrage ist gerade nicht möglich.');const data=await r.json();
+    const r=await fetch('/chat/stream',{method:'POST',headers:{'content-type':'application/json','accept':'text/event-stream'},body:JSON.stringify({session_id:sid,message:text,client_context:{local_time:new Date().toISOString(),device_type:matchMedia('(max-width: 700px)').matches?'mobile':'desktop'}})});
+    if(!r.ok||!r.body)throw new Error('Die Anfrage ist gerade nicht möglich.');
+    const reader=r.body.getReader(),decoder=new TextDecoder();let buffer='',data=null,streamed='';
+    pending.classList.remove('typing-bubble');pending.querySelector('.bubble-text').textContent='';
+    while(true){const {value,done}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const blocks=buffer.split('\n\n');buffer=blocks.pop();for(const block of blocks){const kind=(block.match(/^event: (.+)$/m)||[])[1],raw=(block.match(/^data: (.+)$/m)||[])[1];if(!raw)continue;const event=JSON.parse(raw);if(kind==='meta')data=event;if(kind==='delta'){streamed+=event.text;pending.querySelector('.bubble-text').textContent=streamed;messages.scrollTop=messages.scrollHeight}}}
+    if(!data)throw new Error('Ungültige Antwort');data.message=streamed;
     sid=data.session_id;sessionStorage.setItem('mecky-session',sid);updateUsage(data);
     if(data.usage?.model_called&&data.usage.model)modelLabel.textContent=data.usage.model;
-    const pause=Math.min(3200,Math.max(1100,700+data.message.length*12));
-    await new Promise(resolve=>setTimeout(resolve,Math.max(0,pause-(performance.now()-started))));
     pending.remove();bubble('mecky',data.message,data);
   }catch(e){pending.remove();bubble('mecky','Die Verbindung hakt gerade. Versuch es bitte gleich noch einmal.')}
   finally{document.getElementById('chat-status').textContent='Online · Testchat';busy=false;input.disabled=false;form.querySelector('button').disabled=false;input.focus()}

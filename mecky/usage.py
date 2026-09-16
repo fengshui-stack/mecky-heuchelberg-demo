@@ -16,7 +16,7 @@ def session_usage(db, sid):
     unknown_costs = sum(row["cost_usd"] is None for row in rows)
     unknown_tokens = sum(not row["tokens_complete"] for row in rows)
     known_cost = sum(row["cost_usd"] or 0 for row in rows)
-    calls = sum(row["model_called"] for row in rows)
+    calls = sum(row.get("model_calls", 1 if row["model_called"] else 0) for row in rows)
     return {"answers": len(rows), "model_calls": calls, "currency": "USD",
             "tokens_input": sum(row["tokens_input"] or 0 for row in rows),
             "tokens_output": sum(row["tokens_output"] or 0 for row in rows),

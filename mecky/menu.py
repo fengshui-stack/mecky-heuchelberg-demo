@@ -1,10 +1,16 @@
 """High-precision menu reading from the current, officially linked PDF."""
 import json
 import re
+import unicodedata
 from datetime import datetime, timedelta, timezone
 
 from .store import stable_id
-from .understanding import normalize
+
+def normalize(value: str) -> str:
+    """Normalize menu text locally; this is parsing, not conversation routing."""
+    value = unicodedata.normalize("NFKD", value.casefold())
+    value = "".join(char for char in value if not unicodedata.combining(char))
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", value)).strip()
 
 HEADINGS = {"aus dem steinofen", "aus dem smoker", "desserts", "vegan lecker", "immer wieder ein erlebnis", "heuchelberg specials", "klassiker", "wasser aus deutschland", "unsere", "zum", "vorab", "dressings", "nur auf vorbestellung", "aus dem schwarzwald", "fruchtiges aus der region", "feines zum", "mitfunky farbwechsel", "hä llischem landschwein", "doofrepus doofrepus"}
 PRICE = re.compile(r"(?<!\d)(\d{1,3})\s*,\s*(\d{2})(?:\s*€)?(?!\d)")

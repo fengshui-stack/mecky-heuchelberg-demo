@@ -7,7 +7,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 load_dotenv()
@@ -23,6 +23,9 @@ if origins:
 class ChatInput(BaseModel):
     session_id: str | None = Field(default=None,max_length=100)
     message: str = Field(min_length=1,max_length=2000)
+    user_id: str | None = Field(default=None,max_length=100)
+    memory_consent: bool = False
+    client_context: dict | None = None
 
 class KnowledgeInput(BaseModel):
     category: str = Field(min_length=2,max_length=80)
@@ -62,7 +65,9 @@ def health():
     docs=db.execute("SELECT count(*) FROM documents").fetchone()[0]
     chunks=db.execute("SELECT count(*) FROM document_chunks").fetchone()[0]
     db.close()
-    return {"api":"ok","database":"ok","knowledge_index":"ready" if chunks else "empty","documents":docs,"provider":configured_provider()}
+    from .provider import model_configuration
+    return {"api":"ok","database":"ok","knowledge_index":"ready" if chunks else "empty","documents":docs,
+            "provider":configured_provider(),"model":model_configuration()["model"],"architecture":"model-led-tools-validator"}
 
 @app.post("/chat")
 def chat_route(body:ChatInput):
@@ -71,7 +76,16 @@ def chat_route(body:ChatInput):
     sid=body.session_id or secrets.token_urlsafe(18)
     if not sid.replace("-","").replace("_","").isalnum():
         raise HTTPException(422,"Invalid session ID")
-    return chat(sid,body.message.strip())
+    return chat(sid,body.message.strip(),user_id=body.user_id,memory_consent=body.memory_consent,client_context=body.client_context)
+
+@app.post("/chat/stream")
+def chat_stream(body:ChatInput):
+    if not body.message.strip(): raise HTTPException(422,"Message must not be blank")
+    sid=body.session_id or secrets.token_urlsafe(18)
+    if not sid.replace("-","").replace("_","").isalnum(): raise HTTPException(422,"Invalid session ID")
+    from .streaming import events
+    result=chat(sid,body.message.strip(),user_id=body.user_id,memory_consent=body.memory_consent,client_context=body.client_context)
+    return StreamingResponse(events(result),media_type="text/event-stream",headers={"Cache-Control":"no-cache","X-Accel-Buffering":"no"})
 
 @app.get("/model")
 def model_info():
@@ -84,6 +98,12 @@ def feedback(body:FeedbackInput):
     if not db.execute("SELECT 1 FROM interactions WHERE id=?",(body.interaction_id,)).fetchone():
         db.close();raise HTTPException(404,"Interaction not found")
     db.execute("INSERT INTO feedback(interaction_id,rating,comment,created_at) VALUES(?,?,?,?)",(body.interaction_id,body.rating,body.comment,now()))
+    row=db.execute("SELECT session_id FROM interactions WHERE id=?",(body.interaction_id,)).fetchone()
+    session_row=db.execute("SELECT context FROM sessions WHERE id=?",(row["session_id"],)).fetchone()
+    if session_row:
+        state=json.loads(session_row["context"])
+        state["feedback_history"]=(state.get("feedback_history",[])+[{"interaction_id":body.interaction_id,"rating":body.rating}])[-10:]
+        db.execute("UPDATE sessions SET context=?,updated_at=? WHERE id=?",(json.dumps(state,ensure_ascii=False),now(),row["session_id"]))
     db.commit();db.close()
     return {"ok":True}
 
@@ -137,12 +157,17 @@ def analytics(x_admin_secret:str|None=Header(default=None)):
     intents=[dict(x) for x in db.execute("SELECT intent,count(*) count,avg(confidence) confidence FROM interactions GROUP BY intent ORDER BY count DESC LIMIT 20")]
     negative=[dict(x) for x in db.execute("SELECT f.rating,f.comment,i.intent,i.answer FROM feedback f JOIN interactions i ON i.id=f.interaction_id WHERE f.rating<0 ORDER BY f.id DESC LIMIT 20")]
     model_usage=[dict(x) for x in db.execute("SELECT provider,model,count(*) requests,sum(tokens_input) tokens_input,sum(tokens_output) tokens_output,sum(estimated_cost) estimated_cost FROM llm_usage GROUP BY provider,model")]
-    response_types=[dict(x) for x in db.execute("SELECT json_extract(detail,'$.type') response_type,count(*) count FROM decision_events WHERE stage='response' GROUP BY response_type ORDER BY count DESC")]
-    retrieval=db.execute("SELECT count(*) requests,sum(CASE WHEN json_extract(detail,'$.gate')=1 THEN 1 ELSE 0 END) indexed_searches,sum(coalesce(json_extract(detail,'$.indexed_hits'),0)) indexed_hits FROM decision_events WHERE stage='retrieval'").fetchone()
+    response_types=[dict(x) for x in db.execute("SELECT json_extract(detail,'$.response_type') response_type,count(*) count FROM decision_events WHERE stage='rendering' GROUP BY response_type ORDER BY count DESC")]
     total=db.execute("SELECT count(*) FROM interactions").fetchone()[0]
+    generation=dict(db.execute("SELECT count(*) turns,sum(CASE WHEN json_extract(detail,'$.llm_called')=1 THEN 1 ELSE 0 END) llm_turns,sum(coalesce(json_extract(detail,'$.tool_rounds'),0)) tool_rounds FROM decision_events WHERE stage='agent'").fetchone())
+    validator=[dict(x) for x in db.execute("SELECT json_extract(detail,'$.validator_result') result,count(*) count FROM decision_events WHERE stage='validator' GROUP BY result ORDER BY count DESC")]
+    latency=dict(db.execute("SELECT avg(latency_ms) average_ms,max(latency_ms) max_ms FROM interactions").fetchone())
+    tokens_daily=[dict(x) for x in db.execute("SELECT substr(created_at,1,10) day,sum(tokens_input) tokens_input,sum(tokens_output) tokens_output,sum(estimated_cost) estimated_cost FROM llm_usage GROUP BY day ORDER BY day DESC LIMIT 31")]
+    tools=[dict(x) for x in db.execute("SELECT value tool,count(*) count FROM decision_events,json_each(decision_events.detail,'$.tools_called') WHERE stage='tools' GROUP BY tool ORDER BY count DESC")]
     db.close()
     return {"total":total,"intents":intents,"negative_feedback":negative,"model_usage":model_usage,
-            "response_types":response_types,"retrieval":{"requests":retrieval[0],"indexed_searches":retrieval[1],"indexed_hits":retrieval[2]}}
+            "response_types":response_types,
+            "generation":generation,"validator_failures":validator,"latency":latency,"tokens_per_day":tokens_daily,"tool_use":tools}
 
 @app.get("/admin/traces")
 def traces(limit:int=20,x_admin_secret:str|None=Header(default=None)):
@@ -153,6 +178,17 @@ def traces(limit:int=20,x_admin_secret:str|None=Header(default=None)):
           for x in db.execute("SELECT interaction_id,stage,detail,created_at FROM decision_events ORDER BY id DESC LIMIT ?",(limit,))]
     db.close()
     return {"items":rows}
+
+@app.get("/admin/traces/{interaction_id}")
+def interaction_trace(interaction_id:int,x_admin_secret:str|None=Header(default=None)):
+    require_admin(x_admin_secret)
+    db=connect()
+    if not db.execute("SELECT 1 FROM interactions WHERE id=?",(interaction_id,)).fetchone():
+        db.close();raise HTTPException(404,"Interaction not found")
+    stages=[{"stage":x["stage"],"detail":json.loads(x["detail"]),"created_at":x["created_at"]}
+            for x in db.execute("SELECT stage,detail,created_at FROM decision_events WHERE interaction_id=? ORDER BY id",(interaction_id,))]
+    db.close()
+    return {"interaction_id":interaction_id,"stages":stages}
 
 @app.get("/")
 def index(): return FileResponse(Path("frontend/index.html"))
