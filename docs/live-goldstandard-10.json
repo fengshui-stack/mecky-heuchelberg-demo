@@ -1,0 +1,840 @@
+{
+  "url": "https://mecky-heuchelberg-demo.onrender.com",
+  "cases": 11,
+  "passed": 11,
+  "rows": [
+    {
+      "session": "t1",
+      "message": "Hi",
+      "expected_tools": [],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t1",
+        "message": "Servus! Was kann ich für dich tun?",
+        "links": [],
+        "confidence": 0.98,
+        "intent": "SMALLTALK",
+        "intents": [],
+        "status": "KNOWN",
+        "response_type": "smalltalk",
+        "actions": [],
+        "show_feedback": false,
+        "sources": [],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 1,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 2,
+          "tokens_input": 1548,
+          "tokens_output": 140,
+          "tokens_total": 1688,
+          "tokens_complete": true,
+          "cost_usd": 0.0006670000000000001,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 2,
+          "currency": "USD",
+          "tokens_input": 1548,
+          "tokens_output": 140,
+          "tokens_total": 1688,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.0006670000000000001,
+          "known_cost_usd": 0.0006670000000000001,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 4249,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t1",
+      "message": "Hi",
+      "expected_tools": [],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true,
+        "not_repeated": true
+      },
+      "response": {
+        "session_id": "gold-t1",
+        "message": "Hey nochmal! Alles klar bei dir?",
+        "links": [],
+        "confidence": 0.98,
+        "intent": "SMALLTALK",
+        "intents": [],
+        "status": "KNOWN",
+        "response_type": "smalltalk",
+        "actions": [],
+        "show_feedback": false,
+        "sources": [],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 2,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 2,
+          "tokens_input": 1567,
+          "tokens_output": 126,
+          "tokens_total": 1693,
+          "tokens_complete": true,
+          "cost_usd": 0.00064375,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 2,
+          "model_calls": 4,
+          "currency": "USD",
+          "tokens_input": 3115,
+          "tokens_output": 266,
+          "tokens_total": 3381,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.00131075,
+          "known_cost_usd": 0.00131075,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 3900,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t2",
+      "message": "kann man bei euch hochfahrn?",
+      "expected_tools": [
+        "get_directions",
+        "get_parking_info"
+      ],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t2",
+        "message": "Auto kannst du nicht bis rauffahren – Parken ist unten am Fuß vom Hügel, dann etwa 10 Minuten zu Fuß. Es gibt aber einen Shuttle, wenn’s nötig ist. 🚶‍♂️",
+        "links": [
+          {
+            "url": "https://heuchelberg.com/",
+            "title": "Anfahrt"
+          }
+        ],
+        "confidence": 0.98,
+        "intent": "get_parking_info",
+        "intents": [
+          "get_parking_info"
+        ],
+        "status": "KNOWN",
+        "response_type": "factual",
+        "actions": [
+          {
+            "type": "GET_DIRECTIONS",
+            "label": "Anfahrt",
+            "url": "https://heuchelberg.com/"
+          }
+        ],
+        "show_feedback": true,
+        "sources": [
+          {
+            "title": "Parken",
+            "url": "https://heuchelberg.com/",
+            "source_type": "structured_fact",
+            "crawl_timestamp": "2026-09-15T18:05:03.473713+00:00",
+            "content_date": null,
+            "valid_from": null,
+            "valid_until": null,
+            "priority": 3
+          }
+        ],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 3,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 3,
+          "tokens_input": 3036,
+          "tokens_output": 201,
+          "tokens_total": 3237,
+          "tokens_complete": true,
+          "cost_usd": 0.0011610000000000001,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 3,
+          "currency": "USD",
+          "tokens_input": 3036,
+          "tokens_output": 201,
+          "tokens_total": 3237,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.0011610000000000001,
+          "known_cost_usd": 0.0011610000000000001,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 5833,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t3",
+      "message": "ich habe geschissen",
+      "expected_tools": [],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t3",
+        "message": "Alles gut — das passiert jedem mal. Brauchst du Hilfe oder willst du nur kurz Dampf ablassen?",
+        "links": [],
+        "confidence": 0.98,
+        "intent": "CASUAL",
+        "intents": [],
+        "status": "KNOWN",
+        "response_type": "casual",
+        "actions": [],
+        "show_feedback": false,
+        "sources": [],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 4,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 2,
+          "tokens_input": 1564,
+          "tokens_output": 142,
+          "tokens_total": 1706,
+          "tokens_complete": true,
+          "cost_usd": 0.000675,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 2,
+          "currency": "USD",
+          "tokens_input": 1564,
+          "tokens_output": 142,
+          "tokens_total": 1706,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.000675,
+          "known_cost_usd": 0.000675,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 4122,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t4",
+      "message": "habt ihr bier?",
+      "expected_tools": [
+        "get_drinks"
+      ],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t4",
+        "message": "Ja, haben wir — z. B. Palmbräu Turm-Bier, Palmbräu Turm-Weizen, Naturtrübes Pils, Diesel (Cola-Bier) und weitere, mit Größen/Preisen auf der Karte. Soll ich dir die Preise für ein bestimmtes Bier schicken? 🍺",
+        "links": [
+          {
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/GETRAeNKEKARTE-26-FINAL.pdf",
+            "title": "Getränkekarte"
+          }
+        ],
+        "confidence": 0.98,
+        "intent": "get_drinks",
+        "intents": [
+          "get_drinks"
+        ],
+        "status": "KNOWN",
+        "response_type": "factual",
+        "actions": [
+          {
+            "type": "VIEW_DRINKS",
+            "label": "Getränkekarte",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/GETRAeNKEKARTE-26-FINAL.pdf"
+          }
+        ],
+        "show_feedback": true,
+        "sources": [
+          {
+            "title": "GETRAeNKEKARTE-26-FINAL.pdf",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/GETRAeNKEKARTE-26-FINAL.pdf",
+            "source_type": "pdf",
+            "crawl_timestamp": "2026-09-15T17:57:09.117483+00:00",
+            "content_date": null,
+            "valid_from": null,
+            "valid_until": null,
+            "priority": 4
+          }
+        ],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 5,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 3,
+          "tokens_input": 6371,
+          "tokens_output": 253,
+          "tokens_total": 6624,
+          "tokens_complete": true,
+          "cost_usd": 0.00209875,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 3,
+          "currency": "USD",
+          "tokens_input": 6371,
+          "tokens_output": 253,
+          "tokens_total": 6624,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.00209875,
+          "known_cost_usd": 0.00209875,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 7584,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t5",
+      "message": "ich hab hunger",
+      "expected_tools": [
+        "get_menu"
+      ],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t5",
+        "message": "Alles klar — hungrig, super! Hier sind ein paar Optionen von unserer Karte: Käsespätzle; BBQ-Chicken-Bowl (14,90 €); BBQ-Beef-Bowl (14,90 €); Karotten-Ingwer-Suppe (vegan, 7,50 €); Ofenkartoffel (9,90 €). Soll’s vegetarisch/vegan sein oder lieber Fleisch? 🙂",
+        "links": [
+          {
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "title": "Speisekarte"
+          }
+        ],
+        "confidence": 0.98,
+        "intent": "get_menu",
+        "intents": [
+          "get_menu"
+        ],
+        "status": "KNOWN",
+        "response_type": "factual",
+        "actions": [
+          {
+            "type": "VIEW_MENU",
+            "label": "Speisekarte",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf"
+          }
+        ],
+        "show_feedback": true,
+        "sources": [
+          {
+            "title": "SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "source_type": "pdf",
+            "crawl_timestamp": "2026-09-15T17:57:18.001070+00:00",
+            "content_date": null,
+            "valid_from": null,
+            "valid_until": null,
+            "priority": 4
+          }
+        ],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 6,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 3,
+          "tokens_input": 7177,
+          "tokens_output": 297,
+          "tokens_total": 7474,
+          "tokens_complete": true,
+          "cost_usd": 0.00238825,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 3,
+          "currency": "USD",
+          "tokens_input": 7177,
+          "tokens_output": 297,
+          "tokens_total": 7474,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.00238825,
+          "known_cost_usd": 0.00238825,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 7313,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t6",
+      "message": "was kostet das schnitzel?",
+      "expected_tools": [
+        "get_menu"
+      ],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t6",
+        "message": "Das Hähnchenschnitzel steht auf der Karte: 19,90 € (kleine Portion 15,90 €). Für das Kinderschnitzel sind’s 13,40 €. 😊",
+        "links": [
+          {
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "title": "Speisekarte"
+          }
+        ],
+        "confidence": 0.98,
+        "intent": "get_menu",
+        "intents": [
+          "get_menu"
+        ],
+        "status": "KNOWN",
+        "response_type": "factual",
+        "actions": [
+          {
+            "type": "VIEW_MENU",
+            "label": "Speisekarte",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf"
+          }
+        ],
+        "show_feedback": true,
+        "sources": [
+          {
+            "title": "SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "source_type": "pdf",
+            "crawl_timestamp": "2026-09-15T17:57:18.001070+00:00",
+            "content_date": null,
+            "valid_from": null,
+            "valid_until": null,
+            "priority": 4
+          }
+        ],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 7,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 3,
+          "tokens_input": 4140,
+          "tokens_output": 217,
+          "tokens_total": 4357,
+          "tokens_complete": true,
+          "cost_usd": 0.001469,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 3,
+          "currency": "USD",
+          "tokens_input": 4140,
+          "tokens_output": 217,
+          "tokens_total": 4357,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.001469,
+          "known_cost_usd": 0.001469,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 7845,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t7",
+      "message": "du fotze",
+      "expected_tools": [],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t7",
+        "message": "Bleib bitte respektvoll — so antworte ich nicht. Wenn etwas nicht passt, sag kurz, was du brauchst.",
+        "links": [],
+        "confidence": 0.98,
+        "intent": "ABUSE",
+        "intents": [],
+        "status": "KNOWN",
+        "response_type": "abuse",
+        "actions": [],
+        "show_feedback": false,
+        "sources": [],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 8,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 2,
+          "tokens_input": 1565,
+          "tokens_output": 129,
+          "tokens_total": 1694,
+          "tokens_complete": true,
+          "cost_usd": 0.00064925,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 2,
+          "currency": "USD",
+          "tokens_input": 1565,
+          "tokens_output": 129,
+          "tokens_total": 1694,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.00064925,
+          "known_cost_usd": 0.00064925,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 3989,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t8",
+      "message": "morgen offen?",
+      "expected_tools": [
+        "get_opening_hours"
+      ],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t8",
+        "message": "Ja — morgen (17.09.2026) haben wir geöffnet: 12:00–22:00. 😊",
+        "links": [
+          {
+            "url": "https://heuchelberg.com/",
+            "title": "Öffnungszeiten"
+          }
+        ],
+        "confidence": 0.98,
+        "intent": "get_opening_hours",
+        "intents": [
+          "get_opening_hours"
+        ],
+        "status": "KNOWN",
+        "response_type": "factual",
+        "actions": [
+          {
+            "type": "VIEW_SOURCE",
+            "label": "Öffnungszeiten",
+            "url": "https://heuchelberg.com/"
+          }
+        ],
+        "show_feedback": true,
+        "sources": [
+          {
+            "title": "Öffnungszeiten",
+            "url": "https://heuchelberg.com/",
+            "source_type": "structured_fact",
+            "crawl_timestamp": "2026-09-15T18:05:03.474328+00:00",
+            "content_date": null,
+            "valid_from": "2026-09-01",
+            "valid_until": "2026-09-31",
+            "priority": 3
+          }
+        ],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 9,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 3,
+          "tokens_input": 3039,
+          "tokens_output": 216,
+          "tokens_total": 3255,
+          "tokens_complete": true,
+          "cost_usd": 0.00119175,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 3,
+          "currency": "USD",
+          "tokens_input": 3039,
+          "tokens_output": 216,
+          "tokens_total": 3255,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.00119175,
+          "known_cost_usd": 0.00119175,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 7127,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t9",
+      "message": "ich hab hunger",
+      "expected_tools": [
+        "get_menu"
+      ],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t9",
+        "message": "Klar, Hunger! Wir haben z.B. vegane Karotten-Ingwer-Suppe (7,50 €), Käsespätzle, BBQ-Bowls (je 14,90 €) und Ofenkartoffel (9,90 €). Soll ich dir vegetarische/vegane Optionen filtern oder was Leichtes vs. Herzhaftes? 😊",
+        "links": [
+          {
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "title": "Speisekarte"
+          }
+        ],
+        "confidence": 0.98,
+        "intent": "get_menu",
+        "intents": [
+          "get_menu"
+        ],
+        "status": "KNOWN",
+        "response_type": "factual",
+        "actions": [
+          {
+            "type": "VIEW_MENU",
+            "label": "Speisekarte",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf"
+          }
+        ],
+        "show_feedback": true,
+        "sources": [
+          {
+            "title": "SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/SPEISEKARTE-FRUeHLING-SOMMER-26-FINAL.pdf",
+            "source_type": "pdf",
+            "crawl_timestamp": "2026-09-15T17:57:18.001070+00:00",
+            "content_date": null,
+            "valid_from": null,
+            "valid_until": null,
+            "priority": 4
+          }
+        ],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 10,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 3,
+          "tokens_input": 7169,
+          "tokens_output": 290,
+          "tokens_total": 7459,
+          "tokens_complete": true,
+          "cost_usd": 0.0023722500000000002,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 1,
+          "model_calls": 3,
+          "currency": "USD",
+          "tokens_input": 7169,
+          "tokens_output": 290,
+          "tokens_total": 7459,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.0023722500000000002,
+          "known_cost_usd": 0.0023722500000000002,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 7328,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    },
+    {
+      "session": "t9",
+      "message": "und trinken?",
+      "expected_tools": [
+        "get_drinks"
+      ],
+      "checks": {
+        "model_called": true,
+        "validator_passed": true,
+        "no_old_fallback": true,
+        "not_fallback": true,
+        "expected_tool": true
+      },
+      "response": {
+        "session_id": "gold-t9",
+        "message": "Klar — wir haben u.a. Palmbrau-Turm-Bier (0,3l 4,30€ / 0,5l 5,20€), Aperol Spritz (0,25l 8,90€ / 0,4l 12,40€), Bergschorlen & Berglimos (0,4l 5,60€), Tafelwasser still/spritzig (0,2l 3,10€) und verschiedene Weine/Sekt (z.B. Turmschampus 0,1l 4,60€). Soll’s ein Bier, Cocktail oder was Alkoholfreies sein? 🍺",
+        "links": [
+          {
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/GETRAeNKEKARTE-26-FINAL.pdf",
+            "title": "Getränkekarte"
+          }
+        ],
+        "confidence": 0.98,
+        "intent": "get_drinks",
+        "intents": [
+          "get_drinks"
+        ],
+        "status": "KNOWN",
+        "response_type": "factual",
+        "actions": [
+          {
+            "type": "VIEW_DRINKS",
+            "label": "Getränkekarte",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/GETRAeNKEKARTE-26-FINAL.pdf"
+          }
+        ],
+        "show_feedback": true,
+        "sources": [
+          {
+            "title": "GETRAeNKEKARTE-26-FINAL.pdf",
+            "url": "https://heuchelberg.com/wp-content/uploads/2026/03/GETRAeNKEKARTE-26-FINAL.pdf",
+            "source_type": "pdf",
+            "crawl_timestamp": "2026-09-15T17:57:09.117483+00:00",
+            "content_date": null,
+            "valid_from": null,
+            "valid_until": null,
+            "priority": 4
+          }
+        ],
+        "handoff": false,
+        "contact": null,
+        "interaction_id": 11,
+        "usage": {
+          "provider": "openai",
+          "model": "gpt-5-mini-2025-08-07",
+          "model_called": true,
+          "model_calls": 3,
+          "tokens_input": 6627,
+          "tokens_output": 430,
+          "tokens_total": 7057,
+          "tokens_complete": true,
+          "cost_usd": 0.00251675,
+          "currency": "USD",
+          "cost_status": "estimated"
+        },
+        "session_usage": {
+          "answers": 2,
+          "model_calls": 6,
+          "currency": "USD",
+          "tokens_input": 13796,
+          "tokens_output": 720,
+          "tokens_total": 14516,
+          "tokens_complete": true,
+          "unknown_token_requests": 0,
+          "cost_usd": 0.004889,
+          "known_cost_usd": 0.004889,
+          "unknown_cost_requests": 0,
+          "cost_status": "estimated"
+        },
+        "latency_ms": 10599,
+        "validator_result": "pass",
+        "retry_count": 0,
+        "fallback_used": false
+      }
+    }
+  ]
+}
