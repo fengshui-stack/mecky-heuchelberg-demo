@@ -25,15 +25,17 @@ def test_tools_return_structured_data_not_guest_copy(seeded_db):
     db=connect()
     dog=execute(db,"get_dog_policy",{})
     booking=execute(db,"get_reservation_policy",{})
+    menu=execute(db,"get_menu",{"category":"all","vegetarian_only":False,"search":None})
     db.close()
     assert dog.data=={"allowed":True,"leash_required":True}
     assert booking.data["online_guest_max"]==14
     assert booking.actions[0]["type"]=="RESERVE"
+    assert all("price" not in item for item in menu.data["items"])
 
 
 def test_responses_api_contract_and_live_usage(monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER","openai");monkeypatch.setenv("OPENAI_API_KEY","test")
-    payload={"model":"gpt-5-mini","output":[{"type":"message","content":[{"type":"output_text","text":json.dumps({"message":"Servus!","response_type":"smalltalk","contact_needed":False})}]}],"usage":{"input_tokens":1000,"output_tokens":250}}
+    payload={"model":"gpt-5-mini","output":[{"type":"message","content":[{"type":"output_text","text":json.dumps({"message":"Grüß Gott!","response_type":"smalltalk","contact_needed":False})}]}],"usage":{"input_tokens":1000,"output_tokens":250}}
     captured={}
     def fake_post(*_args,**kwargs):
         captured.update(kwargs["json"]);return httpx.Response(200,json=payload,request=httpx.Request("POST","https://api.openai.com/v1/responses"))
@@ -41,13 +43,13 @@ def test_responses_api_contract_and_live_usage(monkeypatch):
     result=provider.agent_request([{"role":"user","content":"Hi"}],"persona",tool_definitions(),None)
     assert captured["model"]=="gpt-5-mini" and captured["store"] is False
     assert "temperature" not in captured and captured["text"]["format"]["strict"] is True
-    assert result["payload"]["message"]=="Servus!"
+    assert result["payload"]["message"]=="Grüß Gott!"
     assert result["usage"]["tokens_total"]==1250
     assert result["usage"]["cost_usd"]==pytest.approx(.00075)
 
 
 def test_stream_contract_emits_metadata_before_text(seeded_db,monkeypatch):
-    response={"session_id":"stream","message":"Servus!","usage":{},"session_usage":{},"validator_result":"pass"}
+    response={"session_id":"stream","message":"Grüß Gott!","usage":{},"session_usage":{},"validator_result":"pass"}
     monkeypatch.setattr("mecky.api.chat",lambda *_args,**_kwargs:response)
     client=TestClient(app);result=client.post("/chat/stream",json={"session_id":"stream","message":"Hi"})
     assert result.status_code==200

@@ -63,8 +63,8 @@ TOOL_MODELS = {
 }
 
 DESCRIPTIONS = {
-    "get_menu": "Always call this when a guest expresses hunger or asks about food, a menu or a dish. Read current official dishes, descriptions, prices and dietary labels.",
-    "get_drinks": "Always call this when a guest expresses thirst or asks about drinks. Read current official drinks and prices.",
+    "get_menu": "Always call this when a guest expresses hunger or asks about food, a menu, a dish or current prices. Read current official dishes, descriptions and dietary labels; return the current menu link for price questions.",
+    "get_drinks": "Always call this when a guest expresses thirst or asks about drinks or current prices. Read current official drinks and return the current drinks-list link for price questions.",
     "get_opening_hours": "Read official opening hours for one date.",
     "get_dog_policy": "Read the approved rule for dogs.",
     "get_events": "Read confirmed official events in a date range.",
@@ -161,11 +161,11 @@ def execute(db, name: str, arguments: dict) -> ToolOutput:
         category="drinks" if name=="get_drinks" else "menu"
         search=getattr(args,"search",None) or (args.dish if name=="get_allergen_info" else None)
         doc,items=_items(db,category,search,name=="get_vegetarian_options" or getattr(args,"vegetarian_only",False))
-        data_items=[{"name":x["item_name"],"description":x["description"],"price":x["price"],
+        data_items=[{"name":x["item_name"],"description":x["description"],
                      "dietary_labels":json.loads(x["dietary_labels"]),"allergen_labels":json.loads(x["allergen_labels"]),
                      "page":x["page"],"confidence":x["confidence"]} for x in items]
         if search=="schnitzel" and doc and "bergschnitzel" in doc["content"].casefold() and not any("bergschnitzel" in x["name"].casefold() for x in data_items):
-            data_items.insert(0,{"name":"Bergschnitzel","description":None,"price":None,"dietary_labels":[],"allergen_labels":[],"page":None,"confidence":0.6})
+            data_items.insert(0,{"name":"Bergschnitzel","description":None,"dietary_labels":[],"allergen_labels":[],"page":None,"confidence":0.6})
         if search=="schnitzel":
             order=("bergschnitzel","kinderschnitzel")
             data_items.sort(key=lambda item: next((i for i,x in enumerate(order) if x in item["name"].casefold()),len(order)))

@@ -51,7 +51,7 @@ form.addEventListener('submit',e=>{e.preventDefault();send(input.value)});
 suggestions.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>send(b.textContent)));
 document.getElementById('new-chat').addEventListener('click',()=>{
   if(busy)return;sid=null;sessionStorage.removeItem('mecky-session');messages.replaceChildren();
-  bubble('mecky','Servus! Schön, dass du da bist. Wie kann ich dir bei deinem Besuch auf der Heuchelberger Warte helfen?');
+  bubble('mecky','Grüß Gott! Schön, dass du da bist. Wie kann ich dir bei deinem Besuch auf der Heuchelberger Warte helfen?');
   suggestions.hidden=false;usageLabel.textContent='0 Tokens · $0.0000';input.focus();
 });
 fetch('/model').then(r=>r.json()).then(data=>{modelLabel.textContent=data.model||'Regelmodus';usageLabel.textContent='0 Tokens · $0.0000'}).catch(()=>{modelLabel.textContent='Modellstatus unbekannt'});

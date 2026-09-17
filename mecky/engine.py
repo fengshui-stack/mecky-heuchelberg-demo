@@ -16,6 +16,7 @@ from .usage import record_usage,session_usage
 from .validator import parse as parse_verdict,prompt as validator_prompt
 
 TZ=ZoneInfo("Europe/Berlin")
+MONEY_RE=re.compile(r"(?:€|\$|\b(?:euro|eur|usd|dollar|kostenlos|gratis)\b)",re.IGNORECASE)
 
 
 def _persona_prompt()->str:
@@ -125,6 +126,11 @@ def chat(sid,message,*,user_id=None,memory_consent=False,client_context=None):
             if not payload:
                 feedback="Deine Antwort war leer oder nicht schema-konform. Formuliere eine kurze Antwort im geforderten Schema."
                 working_input=list(base_input)
+                continue
+            if MONEY_RE.search(payload["message"]):
+                validator_attempts.append({"attempt":generation_index+1,"verdict":"price_policy","claims":[],"error":None})
+                feedback="Nenne keinen Preis, Geldbetrag, keine Gebühr und kein Bußgeld. Verweise bei Preisfragen kurz auf die passende aktuelle Karte, ohne einen Betrag zu wiederholen."
+                payload=None;working_input=list(base_input)
                 continue
             if stable_id(payload["message"].strip()) in state.get("recent_response_hashes",[]):
                 validator_attempts.append({"attempt":generation_index+1,"verdict":"repeat","claims":[],"error":None})

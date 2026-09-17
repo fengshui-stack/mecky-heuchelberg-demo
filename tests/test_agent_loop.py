@@ -117,3 +117,15 @@ def test_exact_repeat_is_regenerated_before_validation(seeded_db,monkeypatch):
     assert len(judged)==1
     db=store.connect();detail=json.loads(db.execute("SELECT detail FROM decision_events WHERE stage='validator'").fetchone()[0]);db.close()
     assert [x["verdict"] for x in detail["attempts"]]==["repeat","pass"]
+
+
+def test_price_output_is_regenerated_without_money(seeded_db,monkeypatch):
+    monkeypatch.setattr(engine,"configured_provider",lambda:"openai")
+    queue=[answer_result("Das kostet 12,50 €."),answer_result("Die aktuellen Preise findest du in unserer Speisekarte.")]
+    monkeypatch.setattr(engine,"agent_request",lambda *_args,**_kwargs:queue.pop(0))
+    monkeypatch.setattr(engine,"validator_request",lambda *_args,**_kwargs:pass_result())
+    result=engine.chat("no-price","Was kostet das Schnitzel?")
+    assert result["message"]=="Die aktuellen Preise findest du in unserer Speisekarte."
+    assert "€" not in result["message"] and result["retry_count"]==1
+    db=store.connect();detail=json.loads(db.execute("SELECT detail FROM decision_events WHERE stage='validator'").fetchone()[0]);db.close()
+    assert [x["verdict"] for x in detail["attempts"]]==["price_policy","pass"]
