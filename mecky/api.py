@@ -92,6 +92,22 @@ def model_info():
     from .provider import model_configuration
     return model_configuration()
 
+@app.post("/transcribe")
+async def transcribe_route(request:Request):
+    media_type=request.headers.get("content-type","").split(";",1)[0].lower()
+    extensions={"audio/webm":"webm","audio/ogg":"ogg","audio/mp4":"m4a","audio/mpeg":"mp3","audio/wav":"wav","audio/x-wav":"wav"}
+    if media_type not in extensions: raise HTTPException(415,"Unsupported audio format")
+    declared=request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared)>8_000_000: raise HTTPException(413,"Audio file is too large")
+    audio=await request.body()
+    if not 100<=len(audio)<=8_000_000: raise HTTPException(422,"Audio recording is empty or too large")
+    from .provider import transcribe_audio
+    result=transcribe_audio(audio,"mecky-voice."+extensions[media_type],media_type)
+    if result.get("error"): raise HTTPException(502,"Transcription is temporarily unavailable")
+    transcript=(result.get("text") or "").strip()
+    if not transcript: raise HTTPException(422,"No speech was recognized")
+    return {"text":transcript[:2000],"model":result.get("model"),"usage":result.get("usage")}
+
 @app.post("/feedback")
 def feedback(body:FeedbackInput):
     db=connect()

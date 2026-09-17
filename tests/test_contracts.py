@@ -56,6 +56,20 @@ def test_stream_contract_emits_metadata_before_text(seeded_db,monkeypatch):
     assert "message" not in meta and meta["validator_result"]=="pass"
 
 
+def test_server_side_voice_transcription_contract(monkeypatch):
+    captured={}
+    def fake_transcribe(content,filename,media_type):
+        captured.update(size=len(content),filename=filename,media_type=media_type)
+        return {"text":"Habt ihr morgen geöffnet?","model":"gpt-4o-mini-transcribe",
+                "usage":{"tokens_total":42,"cost_usd":.0001},"error":None}
+    monkeypatch.setattr(provider,"transcribe_audio",fake_transcribe)
+    client=TestClient(app)
+    response=client.post("/transcribe",content=b"a"*100,headers={"content-type":"audio/webm"})
+    assert response.status_code==200 and response.json()["text"]=="Habt ihr morgen geöffnet?"
+    assert captured=={"size":100,"filename":"mecky-voice.webm","media_type":"audio/webm"}
+    assert client.post("/transcribe",content=b"a"*100,headers={"content-type":"text/plain"}).status_code==415
+
+
 def test_legacy_conversation_layers_are_gone():
     root=Path(__file__).parents[1]
     removed=("perception","understanding","planning","knowledge","generation","grounding","guardrails","dialogue","read_tools")

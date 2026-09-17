@@ -107,3 +107,28 @@ def validator_request(answer:str,evidence:dict,validator_prompt:str)->dict:
         try:payload=json.loads(text)
         except json.JSONDecodeError:payload=None
     return {"payload":payload,"usage":result["usage"],"error":result["error"]}
+
+
+def transcribe_audio(content:bytes,filename:str,media_type:str)->dict:
+    """Transcribe a short guest recording without exposing the API key to the browser."""
+    model=os.getenv("VOICE_TRANSCRIPTION_MODEL","gpt-4o-mini-transcribe")
+    if configured_provider()!="openai":return {"text":None,"usage":None,"error":"MODEL_NOT_CONFIGURED"}
+    try:
+        response=httpx.post(
+            "https://api.openai.com/v1/audio/transcriptions",
+            headers={"Authorization":"Bearer "+os.environ["OPENAI_API_KEY"]},
+            files={"file":(filename,content,media_type)},
+            data={"model":model,"language":"de","response_format":"json",
+                  "prompt":"Heuchelberger Warte, Mecky, Gastronomie, Reservierung, Speisekarte"},
+            timeout=45,
+        )
+        response.raise_for_status();data=response.json();raw=data.get("usage") or {}
+        tin=raw.get("input_tokens");tout=raw.get("output_tokens")
+        complete=type(tin) is int and type(tout) is int
+        cost=(tin*1.25+tout*5.0)/1_000_000 if complete else None
+        return {"text":data.get("text"),"model":data.get("model") or model,
+                "usage":{"tokens_input":tin,"tokens_output":tout,"tokens_total":tin+tout if complete else None,
+                         "tokens_complete":complete,"cost_usd":cost,"currency":"USD",
+                         "cost_status":"estimated" if cost is not None else "unavailable"},"error":None}
+    except (httpx.HTTPError,ValueError,KeyError,TypeError) as exc:
+        return {"text":None,"model":model,"usage":None,"error":type(exc).__name__}
