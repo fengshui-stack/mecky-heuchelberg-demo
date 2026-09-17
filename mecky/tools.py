@@ -79,7 +79,7 @@ DESCRIPTIONS = {
     "get_group_policy": "Read the group threshold and enquiry action.",
     "get_voucher_info": "Read approved voucher information.",
     "get_weather_dependent_opening": "Read weather-dependent garden and kitchen rules.",
-    "get_venue_info": "Read one approved specialist topic such as garden, children or celebrations.",
+    "get_venue_info": "Read one approved specialist topic. Use wedding for weddings and private_events for a funeral reception, memorial gathering or other private celebration.",
 }
 
 
